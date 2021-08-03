@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
+            <connections>
+                <outlet property="delegate" destination="Voe-Tx-rLC" id="GzC-gU-4Uq"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
+            <connections>
+                <outlet property="CompressionMethodSlider" destination="vd2-pu-y9F" id="EYk-TN-LAC"/>
+                <outlet property="CompressionMethodText" destination="lNL-os-e8F" id="58q-Ch-wyh"/>
+                <outlet property="EncryptionAlgorithmPopup" destination="p51-nJ-TTh" id="Ftq-jO-SU6"/>
+                <outlet property="EncryptionPasswordField" destination="c7Z-Yj-Tbk" id="PqR-5y-5L8"/>
+                <outlet property="EncryptionRepeatField" destination="6qQ-0F-fu0" id="HZz-6H-Bkn"/>
+                <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
+            </connections>
+        </customObject>
+        <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
+        <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
+            <items>
+                <menuItem title="ZipMan" id="1Xt-HY-uBw">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="ZipMan" systemMenu="apple" id="uQy-DD-JDr">
+                        <items>
+                            <menuItem title="About ZipMan" id="5kV-Vb-QxS">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="orderFrontStandardAboutPanel:" target="-1" id="Exp-CZ-Vem"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
+                            <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW"/>
+                            <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
+                            <menuItem title="Services" id="NMo-om-nkz">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Services" systemMenu="services" id="hz9-B4-Xy5"/>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="4je-JR-u6R"/>
+                            <menuItem title="Hide ZipMan" keyEquivalent="h" id="Olw-nP-bQN">
+                                <connections>
+                                    <action selector="hide:" target="-1" id="PnN-Uc-m68"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Hide Others" keyEquivalent="h" id="Vdr-fp-XzO">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="hideOtherApplications:" target="-1" id="VT4-aY-XCT"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show All" id="Kd2-mp-pUS">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="unhideAllApplications:" target="-1" id="Dhg-Le-xox"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="kCx-OE-vgT"/>
+                            <menuItem title="Quit ZipMan" keyEquivalent="q" id="4sb-4s-VLi">
+                                <connections>
+                                    <action selector="terminate:" target="-1" id="Te7-pn-YzF"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="File" id="dMs-cI-mzQ">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="File" id="bib-Uj-vzu">
+                        <items>
+                            <menuItem title="Create" keyEquivalent="n" id="meb-D7-iKg">
+                                <connections>
+                                    <action selector="FileMenuCreateArchiveClicked:" target="Voe-Tx-rLC" id="1s9-u0-zum"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="M1y-iG-Ohs"/>
+                            <menuItem title="Extract" keyEquivalent="e" id="YdE-zJ-doe">
+                                <connections>
+                                    <action selector="FileMenuExtractArchiveClicked:" target="Voe-Tx-rLC" id="c0b-QH-5Cn"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Window" id="aUF-d1-5bR">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">
+                        <items>
+                            <menuItem title="Minimize" keyEquivalent="m" id="OY7-WF-poV">
+                                <connections>
+                                    <action selector="performMiniaturize:" target="-1" id="VwT-WD-YPe"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom" id="R4o-n2-Eq4">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="performZoom:" target="-1" id="DIl-cC-cCs"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="eu3-7i-yIM"/>
+                            <menuItem title="Bring All to Front" id="LE2-aR-0XJ">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="arrangeInFront:" target="-1" id="DRN-fu-gQh"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Help" id="wpr-3q-Mcd">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
+                        <items>
+                            <menuItem title="ZipMan Help" keyEquivalent="?" id="FKE-Sm-Kum">
+                                <connections>
+                                    <action selector="showHelp:" target="-1" id="y7X-2Q-9no"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+            </items>
+            <point key="canvasLocation" x="200" y="121"/>
+        </menu>
+        <window title="ZipMan" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="335" y="390" width="467" height="218"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1080"/>
+            <view key="contentView" id="EiT-Mj-1SZ">
+                <rect key="frame" x="0.0" y="0.0" width="467" height="218"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                <subviews>
+                    <box boxType="custom" cornerRadius="4" title="Box" transparent="YES" id="VDh-5W-miB">
+                        <rect key="frame" x="0.0" y="-5" width="467" height="223"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <view key="contentView" id="aMq-gZ-8yL">
+                            <rect key="frame" x="17" y="17" width="433" height="189"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="lNL-os-e8F" userLabel="CompressionMethodLabel">
+                                    <rect key="frame" x="-2" y="168" width="437" height="21"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Method: Deflate (Default)" id="Ucx-dy-Su3">
+                                        <font key="font" usesAppearanceFont="YES"/>
+                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vd2-pu-y9F" userLabel="CompressionMethodSlider">
+                                    <rect key="frame" x="-2" y="143" width="437" height="28"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="above" numberOfTickMarks="5" allowsTickMarkValuesOnly="YES" sliderType="linear" id="bmj-UW-V0M"/>
+                                    <connections>
+                                        <action selector="CompressionMethodSliderChanged:" target="Voe-Tx-rLC" id="F8H-he-F7N"/>
+                                    </connections>
+                                </slider>
+                                <box fixedFrame="YES" title="Encryption" translatesAutoresizingMaskIntoConstraints="NO" id="QaJ-JW-iTC" userLabel="Encryption Box">
+                                    <rect key="frame" x="-3" y="2" width="439" height="139"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <view key="contentView" id="I4W-aM-yOc">
+                                        <rect key="frame" x="3" y="3" width="433" height="121"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        <subviews>
+                                            <gridView xPlacement="fill" yPlacement="center" rowAlignment="none" rowSpacing="12" columnSpacing="21" id="Wlf-TG-fF3">
+                                                <rect key="frame" x="20" y="18" width="393" height="86"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                                <rows>
+                                                    <gridRow id="PBd-we-kis"/>
+                                                    <gridRow id="C8b-n5-Q3A"/>
+                                                    <gridRow id="Fgx-nA-xeL"/>
+                                                </rows>
+                                                <columns>
+                                                    <gridColumn id="HQg-j7-dKx"/>
+                                                    <gridColumn width="292" id="cDy-t5-K8C"/>
+                                                </columns>
+                                                <gridCells>
+                                                    <gridCell row="PBd-we-kis" column="HQg-j7-dKx" id="9VR-WL-HKm">
+                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Xs-oi-Wf1">
+                                                            <rect key="frame" x="-2" y="68" width="84" height="16"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Password" id="vtn-rA-cdu">
+                                                                <font key="font" usesAppearanceFont="YES"/>
+                                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                    </gridCell>
+                                                    <gridCell row="PBd-we-kis" column="cDy-t5-K8C" id="faQ-9d-3xY">
+                                                        <secureTextField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="c7Z-Yj-Tbk">
+                                                            <rect key="frame" x="101" y="65" width="292" height="21"/>
+                                                            <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="OlM-ly-ivc">
+                                                                <font key="font" metaFont="system"/>
+                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                <allowedInputSourceLocales>
+                                                                    <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                                                                </allowedInputSourceLocales>
+                                                            </secureTextFieldCell>
+                                                        </secureTextField>
+                                                    </gridCell>
+                                                    <gridCell row="C8b-n5-Q3A" column="HQg-j7-dKx" id="O2R-2V-lVd">
+                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Mb-7G-8iR">
+                                                            <rect key="frame" x="-2" y="35" width="84" height="16"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Repeat" id="ucN-sK-xmR">
+                                                                <font key="font" usesAppearanceFont="YES"/>
+                                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                    </gridCell>
+                                                    <gridCell row="C8b-n5-Q3A" column="cDy-t5-K8C" id="bQa-Xh-B5N">
+                                                        <secureTextField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6qQ-0F-fu0">
+                                                            <rect key="frame" x="101" y="32" width="292" height="21"/>
+                                                            <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="eOK-5T-X2N">
+                                                                <font key="font" metaFont="system"/>
+                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                <allowedInputSourceLocales>
+                                                                    <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                                                                </allowedInputSourceLocales>
+                                                            </secureTextFieldCell>
+                                                        </secureTextField>
+                                                    </gridCell>
+                                                    <gridCell row="Fgx-nA-xeL" column="HQg-j7-dKx" id="LcP-k6-ohg">
+                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Yo-Ue-XPd">
+                                                            <rect key="frame" x="-2" y="2" width="84" height="16"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Algorithm" id="4ER-TJ-Q0A">
+                                                                <font key="font" usesAppearanceFont="YES"/>
+                                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                    </gridCell>
+                                                    <gridCell row="Fgx-nA-xeL" column="cDy-t5-K8C" id="CSe-E7-G3W">
+                                                        <popUpButton key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p51-nJ-TTh">
+                                                            <rect key="frame" x="98" y="-4" width="299" height="25"/>
+                                                            <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="JPQ-1Z-V6h" id="E4m-qd-vHE">
+                                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                <font key="font" metaFont="menu"/>
+                                                                <menu key="menu" id="MKJ-nM-nEK">
+                                                                    <items>
+                                                                        <menuItem title="Item 1" state="on" id="JPQ-1Z-V6h"/>
+                                                                        <menuItem title="Item 2" id="UII-fl-eka"/>
+                                                                        <menuItem title="Item 3" id="z8k-ul-2wN"/>
+                                                                    </items>
+                                                                </menu>
+                                                            </popUpButtonCell>
+                                                        </popUpButton>
+                                                    </gridCell>
+                                                </gridCells>
+                                            </gridView>
+                                        </subviews>
+                                    </view>
+                                </box>
+                            </subviews>
+                        </view>
+                        <size key="contentViewMargins" width="16" height="16"/>
+                    </box>
+                </subviews>
+            </view>
+            <point key="canvasLocation" x="200.5" y="372"/>
+        </window>
+    </objects>
+</document>
