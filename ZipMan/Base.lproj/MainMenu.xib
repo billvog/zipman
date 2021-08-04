@@ -73,13 +73,13 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="File" id="bib-Uj-vzu">
                         <items>
-                            <menuItem title="Create" keyEquivalent="n" id="meb-D7-iKg">
+                            <menuItem title="Create Archive" keyEquivalent="n" id="meb-D7-iKg">
                                 <connections>
                                     <action selector="FileMenuCreateArchiveClicked:" target="Voe-Tx-rLC" id="1s9-u0-zum"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="M1y-iG-Ohs"/>
-                            <menuItem title="Extract" keyEquivalent="e" id="YdE-zJ-doe">
+                            <menuItem title="Extract Archive" keyEquivalent="e" id="YdE-zJ-doe">
                                 <connections>
                                     <action selector="FileMenuExtractArchiveClicked:" target="Voe-Tx-rLC" id="c0b-QH-5Cn"/>
                                 </connections>

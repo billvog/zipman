@@ -33,27 +33,18 @@
 	// Insert code here to tear down your application
 }
 
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
+	return TRUE;
+}
+
 - (void)ZipFile:(NSString*)file
+		zipFile:(zip_t*)zip
 	  entryName:(NSString*)entry
-	   password:(NSString*)password
-	 outputPath:(NSString*)output {
+	   password:(NSString*)password {
 	
 	const char *inputPath = [file UTF8String];
-	const char *zipOutputPath = [output UTF8String];
-	
-	// Create & open zip
-	int error_code;
-	zip_error_t *error = malloc(sizeof(zip_error_t));
-	
-	zip_t *zip = zip_open(zipOutputPath, ZIP_CREATE, &error_code);
-	
-	if (zip == NULL) {
-		zip_error_init_with_code(error, error_code);
-		const char *error_msg = zip_error_strerror(error);
-		NSLog(@"Error opening zip: %s", error_msg);
-		[NSException raise:@"Error opening zip" format:@"%s", error_msg];
-	}
-	
+
+	// Open input file
 	zip_source_t* source = zip_source_file(zip, inputPath, 0, -1);
 	if (source == NULL) {
 		NSLog(@"Couldn't open file \"%s\" for read", inputPath);
@@ -127,17 +118,39 @@
 			[NSException raise:@"Error applying encryption" format:@"%s", error_msg];
 		}
 	}
-	
-	// Register for progress callback
-	zip_register_progress_callback_with_state(zip, 0.0, onZipProgress, nil, (__bridge void *)(self));
-	
-	// Close & save zip
-	res = zip_close(zip);
-	if (res == -1) {
+}
+
+- (void)ZipAddDir:(zip_t*)zip
+		entryName:(NSString*)entry {
+	const char *cEntryName = [entry UTF8String];
+	zip_int64_t idx = zip_add_dir(zip, cEntryName);
+	if (idx == -1) {
 		const char *error_msg = zip_strerror(zip);
-		NSLog(@"Error closing zip: %s", error_msg);
-		[NSException raise:@"Error closing zip" format:@"%s", error_msg];
+		NSLog(@"Error adding directory: %s", error_msg);
+		[NSException raise:@"Error adding directory" format:@"%s", error_msg];
 	}
+}
+
+- (void)WalkDirToZip:(NSString*)path
+			 zipFile:(zip_t*)zip
+	   baseEntryName:(NSString*)baseEntry
+			password:(NSString*)password {
+	NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL];
+	[dirs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+		NSString *filename = (NSString *)obj;
+		NSString *entryName = [NSString stringWithFormat:@"%@/%@", baseEntry, filename];
+		NSString *full_path = [NSString stringWithFormat:@"%@/%@", path, filename];
+		NSURL *fileUrl = [NSURL fileURLWithPath:full_path];
+		
+		if ([fileUrl hasDirectoryPath]) {
+			[self ZipAddDir:zip entryName:entryName];
+			[self WalkDirToZip:full_path zipFile:zip baseEntryName:entryName password:password];
+		}
+		else {
+			[self ZipFile:full_path zipFile:zip entryName:entryName
+				 password:password];
+		}
+	}];
 }
 
 void onZipProgress(zip_t *zip, double progress, void *ud) {
@@ -159,36 +172,62 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 		NSString *inputPath = [selectedUrl path];
 		NSString *zipOutputPath = [NSString stringWithFormat:@"%@.zip", [selectedUrl path]];
 		
-		
-		// Add directory
-		if (selectedUrl.hasDirectoryPath) {
-			// TODO
-		}
-		else {
-			@try {
-				NSString *Password = [self.EncryptionPasswordField stringValue];
-				NSString *RepeatedPassword = [self.EncryptionRepeatField stringValue];
-				
-				if (Password.length > 0) {
-					if (![Password isEqualToString:RepeatedPassword]) {
-						NSLog(@"Error verifying passwords: Passwords do not match");
-						[NSException raise:@"Error verifying passwords" format:@"Passwords do not match"];
-					}
+		@try {
+			NSString *Password = [self.EncryptionPasswordField stringValue];
+			NSString *RepeatedPassword = [self.EncryptionRepeatField stringValue];
+			
+			if (Password.length > 0) {
+				if (![Password isEqualToString:RepeatedPassword]) {
+					NSLog(@"Error verifying passwords: Passwords do not match");
+					[NSException raise:@"Error verifying passwords" format:@"Passwords do not match"];
 				}
-				else {
-					Password = nil;
-				}
-				
-				[self ZipFile:inputPath entryName:[selectedUrl lastPathComponent]
-					 password:Password outputPath:zipOutputPath];
-			} @catch (NSException *exception) {
-				NSAlert *alert = [[NSAlert alloc] init];
-				[alert setAlertStyle:NSAlertStyleCritical];
-				[alert setMessageText:exception.name];
-				[alert setInformativeText:exception.reason];
-				[alert runModal];
-				return;
 			}
+			else {
+				Password = nil;
+			}
+			
+			// Create & Open zip
+			const char *cZipOutputPath = [zipOutputPath UTF8String];
+			
+			int error_code;
+			zip_error_t *error = malloc(sizeof(zip_error_t));
+			
+			zip_t *zip = zip_open(cZipOutputPath, ZIP_CREATE, &error_code);
+			if (zip == NULL) {
+				zip_error_init_with_code(error, error_code);
+				const char *error_msg = zip_error_strerror(error);
+				NSLog(@"Error opening zip: %s", error_msg);
+				[NSException raise:@"Error opening zip" format:@"%s", error_msg];
+			}
+			
+			// Add directory
+			if (selectedUrl.hasDirectoryPath) {
+				[self WalkDirToZip:inputPath zipFile:zip
+					 baseEntryName:[selectedUrl lastPathComponent] password:Password];
+			}
+			// Add file
+			else {
+				[self ZipFile:inputPath zipFile:zip entryName:[selectedUrl lastPathComponent]
+					 password:Password];
+			}
+			
+			// Register for progress callback
+			zip_register_progress_callback_with_state(zip, 0.0, onZipProgress, nil, (__bridge void *)(self));
+			
+			// Close & save zip
+			int res = zip_close(zip);
+			if (res == -1) {
+				const char *error_msg = zip_strerror(zip);
+				NSLog(@"Error closing zip: %s", error_msg);
+				[NSException raise:@"Error closing zip" format:@"%s", error_msg];
+			}
+		} @catch (NSException *exception) {
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setAlertStyle:NSAlertStyleCritical];
+			[alert setMessageText:exception.name];
+			[alert setInformativeText:exception.reason];
+			[alert runModal];
+			return;
 		}
 		
 		NSAlert *alert = [[NSAlert alloc] init];

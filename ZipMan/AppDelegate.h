@@ -24,9 +24,17 @@
 
 // Functions
 - (void)ZipFile:(NSString*)file
+		zipFile:(zip_t*)zip
 	  entryName:(NSString*)entry
-	   password:(NSString*)password
-	 outputPath:(NSString*)output;
+	   password:(NSString*)password;
+
+- (void)ZipAddDir:(zip_t*)zip
+		entryName:(NSString*)entry;
+
+- (void)WalkDirToZip:(NSString*)path
+			 zipFile:(zip_t*)zip
+	   baseEntryName:(NSString*)baseEntry
+			password:(NSString*)password;
 
 // Zip events
 void onZipProgress(zip_t *zip, double progress, void *ud);
