@@ -146,7 +146,7 @@
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="lNL-os-e8F" userLabel="CompressionMethodLabel">
                                     <rect key="frame" x="-2" y="168" width="437" height="21"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Method: Deflate (Default)" id="Ucx-dy-Su3">
+                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Method: Deflate (default)" id="Ucx-dy-Su3">
                                         <font key="font" usesAppearanceFont="YES"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -201,6 +201,9 @@
                                                                     <string>NSAllRomanInputSourcesLocaleIdentifier</string>
                                                                 </allowedInputSourceLocales>
                                                             </secureTextFieldCell>
+                                                            <connections>
+                                                                <action selector="PasswordFieldChanged:" target="Voe-Tx-rLC" id="8Ru-ak-7xq"/>
+                                                            </connections>
                                                         </secureTextField>
                                                     </gridCell>
                                                     <gridCell row="C8b-n5-Q3A" column="HQg-j7-dKx" id="O2R-2V-lVd">
@@ -216,7 +219,7 @@
                                                     <gridCell row="C8b-n5-Q3A" column="cDy-t5-K8C" id="bQa-Xh-B5N">
                                                         <secureTextField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6qQ-0F-fu0">
                                                             <rect key="frame" x="101" y="32" width="292" height="21"/>
-                                                            <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="eOK-5T-X2N">
+                                                            <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="eOK-5T-X2N">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -224,6 +227,9 @@
                                                                     <string>NSAllRomanInputSourcesLocaleIdentifier</string>
                                                                 </allowedInputSourceLocales>
                                                             </secureTextFieldCell>
+                                                            <connections>
+                                                                <action selector="RepeatPasswordFieldChanged:" target="Voe-Tx-rLC" id="M3Z-CR-EV1"/>
+                                                            </connections>
                                                         </secureTextField>
                                                     </gridCell>
                                                     <gridCell row="Fgx-nA-xeL" column="HQg-j7-dKx" id="LcP-k6-ohg">
@@ -239,7 +245,7 @@
                                                     <gridCell row="Fgx-nA-xeL" column="cDy-t5-K8C" id="CSe-E7-G3W">
                                                         <popUpButton key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p51-nJ-TTh">
                                                             <rect key="frame" x="98" y="-4" width="299" height="25"/>
-                                                            <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="JPQ-1Z-V6h" id="E4m-qd-vHE">
+                                                            <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="JPQ-1Z-V6h" id="E4m-qd-vHE">
                                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                 <font key="font" metaFont="menu"/>
                                                                 <menu key="menu" id="MKJ-nM-nEK">
@@ -250,6 +256,9 @@
                                                                     </items>
                                                                 </menu>
                                                             </popUpButtonCell>
+                                                            <connections>
+                                                                <action selector="EncryptionAlgorithmChanged:" target="Voe-Tx-rLC" id="qkJ-Vz-kFD"/>
+                                                            </connections>
                                                         </popUpButton>
                                                     </gridCell>
                                                 </gridCells>

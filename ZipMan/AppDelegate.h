@@ -13,6 +13,9 @@
 @property (nonatomic, retain) NSArray* compressionMethods;
 @property (nonatomic) int CompressionMethodIdx;
 
+@property (nonatomic, retain) NSArray* encryptionAlgorithms;
+@property (nonatomic) int EncryptionAlgorithmIdx;
+
 @property (strong) IBOutlet NSTextField *CompressionMethodText;
 @property (strong) IBOutlet NSSlider *CompressionMethodSlider;
 @property (strong) IBOutlet NSSecureTextField *EncryptionPasswordField;
@@ -21,8 +24,9 @@
 
 // Functions
 - (void)ZipFile:(NSString*)file
-		  entry:(NSString*)entry
-		 output:(NSString*)output;
+	  entryName:(NSString*)entry
+	   password:(NSString*)password
+	 outputPath:(NSString*)output;
 
 // Zip events
 void onZipProgress(zip_t *zip, double progress, void *ud);
@@ -33,6 +37,9 @@ void onZipProgress(zip_t *zip, double progress, void *ud);
 
 // Main Window Events
 - (IBAction)CompressionMethodSliderChanged:(id)sender;
+- (IBAction)PasswordFieldChanged:(id)sender;
+- (IBAction)RepeatPasswordFieldChanged:(id)sender;
+- (IBAction)EncryptionAlgorithmChanged:(id)sender;
 
 @end
 

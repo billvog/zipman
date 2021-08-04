@@ -14,12 +14,18 @@
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+	// Compression settings
+	self.CompressionMethodIdx = 3;
 	self.compressionMethods = [[NSArray alloc] initWithObjects:
 							   @"None", @"BZIP2", @"Deflate (default)", @"XZ", @"ZSTD", nil];
 	
+	// Encryption settings
+	self.EncryptionAlgorithmIdx = 0;
+	self.encryptionAlgorithms = [[NSArray alloc] initWithObjects:
+								 @"AES-128", @"AES-192", @"AES-256", nil];
+	
 	[self.EncryptionAlgorithmPopup removeAllItems];
-	[self.EncryptionAlgorithmPopup addItemsWithTitles:[[NSArray alloc] initWithObjects:
-													   @"AES-128", @"AES-192", @"AES-256", nil]];
+	[self.EncryptionAlgorithmPopup addItemsWithTitles:self.encryptionAlgorithms];
 }
 
 
@@ -28,8 +34,9 @@
 }
 
 - (void)ZipFile:(NSString*)file
-		  entry:(NSString*)entry
-		 output:(NSString*)output {
+	  entryName:(NSString*)entry
+	   password:(NSString*)password
+	 outputPath:(NSString*)output {
 	
 	const char *inputPath = [file UTF8String];
 	const char *zipOutputPath = [output UTF8String];
@@ -84,12 +91,41 @@
 			break;
 	}
 	
+	// Apply compression
 	int res = zip_set_file_compression(zip, index, CompressionMethod, 0);
 	if (res != 0) {
 		zip_source_free(source);
 		const char *error_msg = zip_strerror(zip);
-		NSLog(@"Error setting compression: %s", error_msg);
-		[NSException raise:@"Error setting compression" format:@"%s", error_msg];
+		NSLog(@"Error applying compression: %s", error_msg);
+		[NSException raise:@"Error applying compression" format:@"%s", error_msg];
+	}
+	
+	// Apply encryption
+	if (password != nil) {
+		zip_uint16_t EncryptionAlgorithm;
+		switch (self.EncryptionAlgorithmIdx) {
+			case 1:
+				EncryptionAlgorithm = ZIP_EM_AES_128;
+				break;
+			case 2:
+				EncryptionAlgorithm = ZIP_EM_AES_192;
+				break;
+			case 3:
+				EncryptionAlgorithm = ZIP_EM_AES_256;
+				break;
+			default:
+				EncryptionAlgorithm = ZIP_EM_AES_128;
+				break;
+		}
+		
+		const char* c_password = [password UTF8String];
+		res = zip_file_set_encryption(zip, index, EncryptionAlgorithm, c_password);
+		if (res != 0) {
+			zip_source_free(source);
+			const char *error_msg = zip_strerror(zip);
+			NSLog(@"Error applying encryption: %s", error_msg);
+			[NSException raise:@"Error applying encryption" format:@"%s", error_msg];
+		}
 	}
 	
 	// Register for progress callback
@@ -130,7 +166,21 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 		}
 		else {
 			@try {
-				[self ZipFile:inputPath entry:[selectedUrl lastPathComponent] output:zipOutputPath];
+				NSString *Password = [self.EncryptionPasswordField stringValue];
+				NSString *RepeatedPassword = [self.EncryptionRepeatField stringValue];
+				
+				if (Password.length > 0) {
+					if (![Password isEqualToString:RepeatedPassword]) {
+						NSLog(@"Error verifying passwords: Passwords do not match");
+						[NSException raise:@"Error verifying passwords" format:@"Passwords do not match"];
+					}
+				}
+				else {
+					Password = nil;
+				}
+				
+				[self ZipFile:inputPath entryName:[selectedUrl lastPathComponent]
+					 password:Password outputPath:zipOutputPath];
 			} @catch (NSException *exception) {
 				NSAlert *alert = [[NSAlert alloc] init];
 				[alert setAlertStyle:NSAlertStyleCritical];
@@ -170,6 +220,31 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 	
 	// Update variable
 	_CompressionMethodIdx = CompressionMethodIdx;
+}
+
+- (IBAction)PasswordFieldChanged:(id)sender {
+	NSString *Password = [self.EncryptionPasswordField stringValue];
+	[_EncryptionRepeatField setEnabled:(Password.length > 0)];
+}
+
+- (IBAction)RepeatPasswordFieldChanged:(id)sender {
+	NSString *Password = [self.EncryptionPasswordField stringValue];
+	NSString *RepPassword = [self.EncryptionRepeatField stringValue];
+	
+	[_EncryptionAlgorithmPopup setEnabled:[Password isEqualToString:RepPassword]];
+}
+
+- (IBAction)EncryptionAlgorithmChanged:(id)sender {
+	int EncAlgorithmsLength = (int) _encryptionAlgorithms.count - 1;
+	int SelectedEncAlgorithmIdx = (int) _EncryptionAlgorithmPopup.indexOfSelectedItem;
+	
+	if (SelectedEncAlgorithmIdx > EncAlgorithmsLength) {
+		NSLog(@"SelectedEncAlgorithmIdx is greater than the length of available compression algorithms: %i", SelectedEncAlgorithmIdx);
+		return;
+	}
+	
+	NSLog(@"Changed encryption algorithm: %@", _encryptionAlgorithms[SelectedEncAlgorithmIdx]);
+	_EncryptionAlgorithmIdx = SelectedEncAlgorithmIdx;
 }
 
 @end
