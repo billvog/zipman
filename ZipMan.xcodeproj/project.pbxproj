@@ -7,13 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		71171D4B26BAE2EA0078F9EE /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 71171D4A26BAE2EA0078F9EE /* Credits.rtf */; };
 		7149599B26B9AC6300892725 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7149599A26B9AC6300892725 /* AppDelegate.m */; };
 		7149599D26B9AC6700892725 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7149599C26B9AC6700892725 /* Assets.xcassets */; };
 		714959A026B9AC6700892725 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7149599E26B9AC6700892725 /* MainMenu.xib */; };
 		714959A326B9AC6700892725 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 714959A226B9AC6700892725 /* main.m */; };
+		71B5473126BA905000F97107 /* Progress.xib in Resources */ = {isa = PBXBuildFile; fileRef = 71B5473026BA905000F97107 /* Progress.xib */; };
+		71B5473426BA907300F97107 /* ProgressController.m in Sources */ = {isa = PBXBuildFile; fileRef = 71B5473326BA907300F97107 /* ProgressController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		71171D4A26BAE2EA0078F9EE /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = ZipMan/Resources/Credits.rtf; sourceTree = "<group>"; };
 		7149599626B9AC6300892725 /* ZipMan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZipMan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7149599926B9AC6300892725 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		7149599A26B9AC6300892725 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -22,6 +26,9 @@
 		714959A126B9AC6700892725 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		714959A226B9AC6700892725 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		714959A426B9AC6700892725 /* ZipMan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZipMan.entitlements; sourceTree = "<group>"; };
+		71B5473026BA905000F97107 /* Progress.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Progress.xib; sourceTree = "<group>"; };
+		71B5473226BA907300F97107 /* ProgressController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressController.h; sourceTree = "<group>"; };
+		71B5473326BA907300F97107 /* ProgressController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProgressController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +42,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		71171D4C26BAE2F50078F9EE /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				71171D4A26BAE2EA0078F9EE /* Credits.rtf */,
+			);
+			name = Resources;
+			path = ..;
+			sourceTree = "<group>";
+		};
 		7149598D26B9AC6300892725 = {
 			isa = PBXGroup;
 			children = (
@@ -54,6 +70,7 @@
 		7149599826B9AC6300892725 /* ZipMan */ = {
 			isa = PBXGroup;
 			children = (
+				71171D4C26BAE2F50078F9EE /* Resources */,
 				7149599926B9AC6300892725 /* AppDelegate.h */,
 				7149599A26B9AC6300892725 /* AppDelegate.m */,
 				7149599C26B9AC6700892725 /* Assets.xcassets */,
@@ -61,6 +78,9 @@
 				714959A126B9AC6700892725 /* Info.plist */,
 				714959A226B9AC6700892725 /* main.m */,
 				714959A426B9AC6700892725 /* ZipMan.entitlements */,
+				71B5473026BA905000F97107 /* Progress.xib */,
+				71B5473226BA907300F97107 /* ProgressController.h */,
+				71B5473326BA907300F97107 /* ProgressController.m */,
 			);
 			path = ZipMan;
 			sourceTree = "<group>";
@@ -121,6 +141,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71171D4B26BAE2EA0078F9EE /* Credits.rtf in Resources */,
+				71B5473126BA905000F97107 /* Progress.xib in Resources */,
 				7149599D26B9AC6700892725 /* Assets.xcassets in Resources */,
 				714959A026B9AC6700892725 /* MainMenu.xib in Resources */,
 			);
@@ -133,6 +155,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71B5473426BA907300F97107 /* ProgressController.m in Sources */,
 				714959A326B9AC6700892725 /* main.m in Sources */,
 				7149599B26B9AC6300892725 /* AppDelegate.m in Sources */,
 			);

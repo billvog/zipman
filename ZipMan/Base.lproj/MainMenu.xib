@@ -73,13 +73,13 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="File" id="bib-Uj-vzu">
                         <items>
-                            <menuItem title="Create Archive" keyEquivalent="n" id="meb-D7-iKg">
+                            <menuItem title="Create Archive..." keyEquivalent="n" id="meb-D7-iKg">
                                 <connections>
                                     <action selector="FileMenuCreateArchiveClicked:" target="Voe-Tx-rLC" id="1s9-u0-zum"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="M1y-iG-Ohs"/>
-                            <menuItem title="Extract Archive" keyEquivalent="e" id="YdE-zJ-doe">
+                            <menuItem title="Extract Archive..." keyEquivalent="e" id="YdE-zJ-doe">
                                 <connections>
                                     <action selector="FileMenuExtractArchiveClicked:" target="Voe-Tx-rLC" id="c0b-QH-5Cn"/>
                                 </connections>
@@ -129,7 +129,6 @@
         </menu>
         <window title="ZipMan" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="467" height="218"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1080"/>
             <view key="contentView" id="EiT-Mj-1SZ">
@@ -243,7 +242,7 @@
                                                         </textField>
                                                     </gridCell>
                                                     <gridCell row="Fgx-nA-xeL" column="cDy-t5-K8C" id="CSe-E7-G3W">
-                                                        <popUpButton key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p51-nJ-TTh">
+                                                        <popUpButton key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p51-nJ-TTh" userLabel="EncryptionMethodPopup">
                                                             <rect key="frame" x="98" y="-4" width="299" height="25"/>
                                                             <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="JPQ-1Z-V6h" id="E4m-qd-vHE">
                                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>

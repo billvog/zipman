@@ -121,7 +121,8 @@
 }
 
 - (void)ZipAddDir:(zip_t*)zip
-		entryName:(NSString*)entry {
+		entryName:(NSString*)entry
+{
 	const char *cEntryName = [entry UTF8String];
 	zip_int64_t idx = zip_add_dir(zip, cEntryName);
 	if (idx == -1) {
@@ -134,7 +135,8 @@
 - (void)WalkDirToZip:(NSString*)path
 			 zipFile:(zip_t*)zip
 	   baseEntryName:(NSString*)baseEntry
-			password:(NSString*)password {
+			password:(NSString*)password
+{
 	NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL];
 	[dirs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 		NSString *filename = (NSString *)obj;
@@ -155,6 +157,11 @@
 
 void onZipProgress(zip_t *zip, double progress, void *ud) {
 	float ProgressFormed = (float)(progress * 100.0);
+	
+	AppDelegate* _self = (__bridge AppDelegate*)(ud);
+	if (_self.progressController != nil)
+		[_self.progressController UpdateProgress:ProgressFormed];
+	
 	NSLog(@"Zip Progress: %.1f", ProgressFormed);
 }
 
@@ -162,6 +169,7 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 	NSOpenPanel *openDialog = [NSOpenPanel openPanel];
 	[openDialog setCanChooseFiles:true];
 	[openDialog setCanChooseDirectories:true];
+	[openDialog setPrompt:@"Archive"];
 	
 	[openDialog beginWithCompletionHandler:^(NSModalResponse result) {
 		if (result != NSModalResponseOK) {
@@ -185,6 +193,9 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 			else {
 				Password = nil;
 			}
+			
+			// Init progress controller
+			self.progressController = [[ProgressController alloc] initWithWindowNibName:@"Progress"];
 			
 			// Create & Open zip
 			const char *cZipOutputPath = [zipOutputPath UTF8String];
@@ -211,8 +222,12 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 					 password:Password];
 			}
 			
+			// Show progress window
+			[self.progressController showWindow:self];
+			
 			// Register for progress callback
 			zip_register_progress_callback_with_state(zip, 0.0, onZipProgress, nil, (__bridge void *)(self));
+			
 			
 			// Close & save zip
 			int res = zip_close(zip);
@@ -228,6 +243,10 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 			[alert setInformativeText:exception.reason];
 			[alert runModal];
 			return;
+		}
+		@finally {
+			[self.progressController close];
+			self.progressController = nil;
 		}
 		
 		NSAlert *alert = [[NSAlert alloc] init];

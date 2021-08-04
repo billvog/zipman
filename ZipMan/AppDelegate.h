@@ -8,19 +8,25 @@
 #import <Cocoa/Cocoa.h>
 #include <zip.h>
 
+#import "ProgressController.h"
+
 @interface AppDelegate: NSObject <NSApplicationDelegate>
 
+// Variables
 @property (nonatomic, retain) NSArray* compressionMethods;
 @property (nonatomic) int CompressionMethodIdx;
 
 @property (nonatomic, retain) NSArray* encryptionAlgorithms;
 @property (nonatomic) int EncryptionAlgorithmIdx;
 
+// UI Elements
 @property (strong) IBOutlet NSTextField *CompressionMethodText;
 @property (strong) IBOutlet NSSlider *CompressionMethodSlider;
 @property (strong) IBOutlet NSSecureTextField *EncryptionPasswordField;
 @property (strong) IBOutlet NSSecureTextField *EncryptionRepeatField;
 @property (strong) IBOutlet NSPopUpButton *EncryptionAlgorithmPopup;
+
+@property ProgressController *progressController;
 
 // Functions
 - (void)ZipFile:(NSString*)file
