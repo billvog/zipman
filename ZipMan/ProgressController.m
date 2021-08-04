@@ -18,7 +18,9 @@
 
 - (void) UpdateProgress:(float) progress {
 	[_ProgressIndicator setDoubleValue:progress];
-	[_ProgressText setStringValue:[NSString stringWithFormat:@"%.1f", progress]];
+	[_ProgressText setStringValue:[NSString stringWithFormat:@"%d%%", (int) progress]];
+	
+//	NSLog(@"Zip Progress: %.1f", progress);
 }
 
 @end

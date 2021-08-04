@@ -159,10 +159,11 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 	float ProgressFormed = (float)(progress * 100.0);
 	
 	AppDelegate* _self = (__bridge AppDelegate*)(ud);
-	if (_self.progressController != nil)
-		[_self.progressController UpdateProgress:ProgressFormed];
-	
-	NSLog(@"Zip Progress: %.1f", ProgressFormed);
+	if (_self.progressController != nil) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[_self.progressController UpdateProgress:ProgressFormed];
+		});
+	}
 }
 
 - (IBAction)FileMenuCreateArchiveClicked:(id)sender {
@@ -224,18 +225,39 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 			
 			// Show progress window
 			[self.progressController showWindow:self];
+			NSWindow *progressWindow = [self.progressController window];
+			[progressWindow setTitle:[NSString stringWithFormat:@"Zipping \"%@\"", zipOutputPath]];
 			
 			// Register for progress callback
 			zip_register_progress_callback_with_state(zip, 0.0, onZipProgress, nil, (__bridge void *)(self));
 			
-			
 			// Close & save zip
-			int res = zip_close(zip);
-			if (res == -1) {
-				const char *error_msg = zip_strerror(zip);
-				NSLog(@"Error closing zip: %s", error_msg);
-				[NSException raise:@"Error closing zip" format:@"%s", error_msg];
-			}
+			void (^zipCloseBlock)(void) = ^{
+				int res = zip_close(zip);
+				
+				// Close dialog
+				dispatch_sync(dispatch_get_main_queue(), ^{
+					[self.progressController close];
+				});
+
+				// Check for errors
+				if (res == -1) {
+					const char *error_msg = zip_strerror(zip);
+					NSLog(@"Error closing zip: %s", error_msg);
+					[NSException raise:@"Error closing zip" format:@"%s", error_msg];
+				}
+				
+				// Display success alert
+				dispatch_sync(dispatch_get_main_queue(), ^{
+					NSAlert *alert = [[NSAlert alloc] init];
+					[alert setMessageText:@"Success"];
+					[alert setInformativeText:[NSString stringWithFormat:@"Zip created at \"%@\"", zipOutputPath]];
+					[alert runModal];
+				});
+			};
+			
+			NSThread *zipCloseThread = [[NSThread alloc] initWithBlock:zipCloseBlock];
+			[zipCloseThread start];
 		} @catch (NSException *exception) {
 			NSAlert *alert = [[NSAlert alloc] init];
 			[alert setAlertStyle:NSAlertStyleCritical];
@@ -244,15 +266,6 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 			[alert runModal];
 			return;
 		}
-		@finally {
-			[self.progressController close];
-			self.progressController = nil;
-		}
-		
-		NSAlert *alert = [[NSAlert alloc] init];
-		[alert setMessageText:@"Success"];
-		[alert setInformativeText:[NSString stringWithFormat:@"Zip created at \"%@\"", zipOutputPath]];
-		[alert runModal];
 	}];
 }
 
