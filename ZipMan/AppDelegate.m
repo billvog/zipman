@@ -161,9 +161,20 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 	AppDelegate* _self = (__bridge AppDelegate*)(ud);
 	if (_self.progressController != nil) {
 		dispatch_async(dispatch_get_main_queue(), ^{
-			[_self.progressController UpdateProgress:ProgressFormed];
+			ProgressController *progressController = _self.progressController;
+			if (progressController.isCanceled) {
+				zip_register_cancel_callback_with_state(zip, &onZipCancel, nil, (__bridge void*)_self);
+				return;
+			}
+				
+			[progressController UpdateProgress:ProgressFormed];
 		});
 	}
+}
+
+int onZipCancel(zip_t *zip, void *ud) {
+	NSLog(@"Canceling zip_close...");
+	return 1;
 }
 
 - (IBAction)FileMenuCreateArchiveClicked:(id)sender {
@@ -238,20 +249,23 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 				// Close dialog
 				dispatch_sync(dispatch_get_main_queue(), ^{
 					[self.progressController close];
-				});
-
-				// Check for errors
-				if (res == -1) {
-					const char *error_msg = zip_strerror(zip);
-					NSLog(@"Error closing zip: %s", error_msg);
-					[NSException raise:@"Error closing zip" format:@"%s", error_msg];
-				}
-				
-				// Display success alert
-				dispatch_sync(dispatch_get_main_queue(), ^{
+					
 					NSAlert *alert = [[NSAlert alloc] init];
-					[alert setMessageText:@"Success"];
-					[alert setInformativeText:[NSString stringWithFormat:@"Zip created at \"%@\"", zipOutputPath]];
+					
+					// Check for errors
+					if (res == -1) {
+						const char *error_msg = zip_strerror(zip);
+						NSLog(@"Error closing zip: %s", error_msg);
+						
+						[alert setAlertStyle:NSAlertStyleCritical];
+						[alert setMessageText:@"Error closing zip"];
+						[alert setInformativeText:[NSString stringWithUTF8String:error_msg]];
+					}
+					else {
+						[alert setMessageText:@"Success"];
+						[alert setInformativeText:[NSString stringWithFormat:@"Zip created at \"%@\"", zipOutputPath]];
+					}
+					
 					[alert runModal];
 				});
 			};
@@ -283,11 +297,12 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 		return;
 	}
 	
-	NSLog(@"Compression Method Changed: %i", CompressionMethodIdx);
+	NSString *CompressionMethodText = _compressionMethods[CompressionMethodIdx];
+	
+	NSLog(@"Compression Method Changed: %i (%@)", CompressionMethodIdx, CompressionMethodText);
 	
 	// Update UI
-	_CompressionMethodText.stringValue = [NSString stringWithFormat:@"Method: %@",
-										  [_compressionMethods objectAtIndex:CompressionMethodIdx]];
+	_CompressionMethodText.stringValue = [NSString stringWithFormat:@"Method: %@", CompressionMethodText];
 	
 	// Update variable
 	_CompressionMethodIdx = CompressionMethodIdx;
@@ -314,7 +329,7 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 		return;
 	}
 	
-	NSLog(@"Changed encryption algorithm: %@", _encryptionAlgorithms[SelectedEncAlgorithmIdx]);
+	NSLog(@"Changed encryption algorithm: %i (%@)", SelectedEncAlgorithmIdx, _encryptionAlgorithms[SelectedEncAlgorithmIdx]);
 	_EncryptionAlgorithmIdx = SelectedEncAlgorithmIdx;
 }
 

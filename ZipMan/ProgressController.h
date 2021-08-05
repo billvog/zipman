@@ -11,10 +11,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ProgressController: NSWindowController
 
+@property (readonly) BOOL isCanceled;
+
 @property (strong) IBOutlet NSProgressIndicator *ProgressIndicator;
 @property (strong) IBOutlet NSTextField *ProgressText;
+@property (strong) IBOutlet NSButton *CancelBtn;
 
-- (void) UpdateProgress:(float) progress;
+- (void)UpdateProgress:(float) progress;
+
+- (IBAction)CancelClicked:(id)sender;
 
 @end
 

@@ -7,6 +7,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ProgressController">
             <connections>
+                <outlet property="CancelBtn" destination="4dC-sb-jmc" id="vCM-9F-d6O"/>
                 <outlet property="ProgressIndicator" destination="fZ7-y4-jHQ" id="oLR-Hd-RFQ"/>
                 <outlet property="ProgressText" destination="dI8-F8-MkR" id="7Gy-cb-ULp"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="rnC-R8-Ebc"/>
@@ -45,6 +46,9 @@
 Gw
 </string>
                         </buttonCell>
+                        <connections>
+                            <action selector="CancelClicked:" target="-2" id="Ofn-Wb-IPe"/>
+                        </connections>
                     </button>
                 </subviews>
             </view>

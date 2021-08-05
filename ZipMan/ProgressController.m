@@ -16,11 +16,14 @@
     [super windowDidLoad];
 }
 
-- (void) UpdateProgress:(float) progress {
+- (void)UpdateProgress:(float) progress {
 	[_ProgressIndicator setDoubleValue:progress];
-	[_ProgressText setStringValue:[NSString stringWithFormat:@"%d%%", (int) progress]];
-	
-//	NSLog(@"Zip Progress: %.1f", progress);
+	[_ProgressText setStringValue:[NSString stringWithFormat:@"%.1f%%", progress]];
+}
+
+- (IBAction)CancelClicked:(id)sender {
+	_isCanceled = TRUE;
+	[_CancelBtn setEnabled:false];
 }
 
 @end
