@@ -203,9 +203,6 @@
                                                                     <string>NSAllRomanInputSourcesLocaleIdentifier</string>
                                                                 </allowedInputSourceLocales>
                                                             </secureTextFieldCell>
-                                                            <connections>
-                                                                <action selector="PasswordFieldChanged:" target="Voe-Tx-rLC" id="8Ru-ak-7xq"/>
-                                                            </connections>
                                                         </secureTextField>
                                                     </gridCell>
                                                     <gridCell row="PBd-we-kis" column="9CF-4e-dC5" id="58N-uR-uAE">
@@ -235,9 +232,6 @@
                                                                     <string>NSAllRomanInputSourcesLocaleIdentifier</string>
                                                                 </allowedInputSourceLocales>
                                                             </secureTextFieldCell>
-                                                            <connections>
-                                                                <action selector="RepeatPasswordFieldChanged:" target="Voe-Tx-rLC" id="M3Z-CR-EV1"/>
-                                                            </connections>
                                                         </secureTextField>
                                                     </gridCell>
                                                     <gridCell row="C8b-n5-Q3A" column="9CF-4e-dC5" id="N2u-aU-ZXB">

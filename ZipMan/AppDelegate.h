@@ -12,7 +12,7 @@
 #import "ProgressController.h"
 #import "PasswordPromptController.h"
 
-@interface AppDelegate: NSObject <NSApplicationDelegate>
+@interface AppDelegate: NSObject <NSApplicationDelegate, NSTextFieldDelegate>
 
 // Variables
 @property (nonatomic, retain) NSArray* compressionMethods;
@@ -40,16 +40,14 @@
 
 - (void)ZipFile:(NSString*)file
 		zipFile:(zip_t*)zip
-	  entryName:(NSString*)entry
-	   password:(NSString*)password;
+	  entryName:(NSString*)entry;
 
 - (void)ZipAddDir:(zip_t*)zip
 		entryName:(NSString*)entry;
 
 - (void)WalkDirToZip:(NSString*)path
 			 zipFile:(zip_t*)zip
-	   baseEntryName:(NSString*)baseEntry
-			password:(NSString*)password;
+	   baseEntryName:(NSString*)baseEntry;
 
 // Zip events
 void onZipCloseProgress(zip_t *zip, double progress, void *ud);
@@ -61,8 +59,6 @@ int onZipCloseCancel(zip_t *zip, void *ud);
 
 // Main Window Events
 - (IBAction)CompressionMethodSliderChanged:(id)sender;
-- (IBAction)PasswordFieldChanged:(id)sender;
-- (IBAction)RepeatPasswordFieldChanged:(id)sender;
 - (IBAction)EncryptionAlgorithmChanged:(id)sender;
 
 @end

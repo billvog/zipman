@@ -28,6 +28,9 @@
 	
 	[self.EncryptionAlgorithmPopup removeAllItems];
 	[self.EncryptionAlgorithmPopup addItemsWithTitles:self.encryptionAlgorithms];
+	
+	self.EncryptionPasswordField.delegate = self;
+	self.EncryptionRepeatField.delegate = self;
 }
 
 
@@ -41,8 +44,7 @@
 
 - (void)ZipFile:(NSString*)file
 		zipFile:(zip_t*)zip
-	  entryName:(NSString*)entry
-	   password:(NSString*)password {
+	  entryName:(NSString*)entry {
 	
 	const char *inputPath = [file UTF8String];
 
@@ -101,8 +103,10 @@
 		[NSException raise:@"Error applying compression" format:@"%s", error_msg];
 	}
 	
-	// Apply encryption
-	if (password != nil) {
+	// Apply encryption (if it is enabled)
+	if (self.isEncryptionEnabled) {
+		NSString *Password = [self.EncryptionPasswordField stringValue];
+		
 		zip_uint16_t EncryptionAlgorithm;
 		switch (self.EncryptionAlgorithmIdx) {
 			case 1:
@@ -118,9 +122,9 @@
 				EncryptionAlgorithm = ZIP_EM_AES_128;
 				break;
 		}
-		
-		const char* c_password = [password UTF8String];
-		res = zip_file_set_encryption(zip, index, EncryptionAlgorithm, c_password);
+
+		const char* cPassword = [Password UTF8String];
+		res = zip_file_set_encryption(zip, index, EncryptionAlgorithm, cPassword);
 		if (res != 0) {
 			zip_source_free(source);
 			const char *error_msg = zip_strerror(zip);
@@ -145,7 +149,6 @@
 - (void)WalkDirToZip:(NSString*)path
 			 zipFile:(zip_t*)zip
 	   baseEntryName:(NSString*)baseEntry
-			password:(NSString*)password
 {
 	NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL];
 	[dirs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
@@ -156,11 +159,10 @@
 		
 		if ([fileUrl hasDirectoryPath]) {
 			[self ZipAddDir:zip entryName:entryName];
-			[self WalkDirToZip:full_path zipFile:zip baseEntryName:entryName password:password];
+			[self WalkDirToZip:full_path zipFile:zip baseEntryName:entryName];
 		}
 		else {
-			[self ZipFile:full_path zipFile:zip entryName:entryName
-				 password:password];
+			[self ZipFile:full_path zipFile:zip entryName:entryName];
 		}
 	}];
 }
@@ -216,12 +218,18 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 
 			if (Password.length > 0) {
 				if (![Password isEqualToString:RepeatedPassword]) {
-					NSLog(@"Error verifying passwords: Passwords do not match");
-					[NSException raise:@"Error verifying passwords" format:@"Passwords do not match"];
+					NSAlert *alert = [[NSAlert alloc] init];
+					[alert setAlertStyle:NSAlertStyleWarning];
+					[alert setMessageText:@"Passwords do not match"];
+					[alert setInformativeText:
+					 @"To use encryption, repeating the password correctly is required to ensure no mistake is made."];
+					[alert addButtonWithTitle:@"Don't encrypt"];
+					[alert addButtonWithTitle:@"Cancel"];
+					NSModalResponse res = [alert runModal];
+					if (res == 1001) {
+						return;
+					}
 				}
-			}
-			else {
-				Password = nil;
 			}
 
 			// Create & Open zip
@@ -241,12 +249,11 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 			// Add directory
 			if (selectedUrl.hasDirectoryPath) {
 				[self WalkDirToZip:inputPath zipFile:zip
-					 baseEntryName:[selectedUrl lastPathComponent] password:Password];
+					 baseEntryName:[selectedUrl lastPathComponent]];
 			}
 			// Add file
 			else {
-				[self ZipFile:inputPath zipFile:zip entryName:[selectedUrl lastPathComponent]
-					 password:Password];
+				[self ZipFile:inputPath zipFile:zip entryName:[selectedUrl lastPathComponent]];
 			}
 
 			// Show progress window
@@ -636,18 +643,19 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 		[self.audioPlayer prepareToPlay];
 		[self.audioPlayer play];
 		
-		NSLog(@"Encryption has been enabled");
+		NSLog(@"Encryption has been %@", isEncryptionEnabled ? @"enabled" : @"disabled");
 	}
 	
 	[_EncryptionAlgorithmPopup setEnabled:isEncryptionEnabled];
 }
 
-- (IBAction)PasswordFieldChanged:(id)sender {
-	[self CheckEncryptionEnabled];
-}
-
-- (IBAction)RepeatPasswordFieldChanged:(id)sender {
-	[self CheckEncryptionEnabled];
+- (void)controlTextDidChange:(NSNotification *)obj {
+	// If the sender is password or repeat password field
+	if (obj.object == self.EncryptionPasswordField ||
+		obj.object == self.EncryptionRepeatField)
+	{
+		[self CheckEncryptionEnabled];
+	}
 }
 
 - (IBAction)EncryptionAlgorithmChanged:(id)sender {
