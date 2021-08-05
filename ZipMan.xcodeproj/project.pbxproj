@@ -14,6 +14,8 @@
 		714959A326B9AC6700892725 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 714959A226B9AC6700892725 /* main.m */; };
 		71B5473126BA905000F97107 /* Progress.xib in Resources */ = {isa = PBXBuildFile; fileRef = 71B5473026BA905000F97107 /* Progress.xib */; };
 		71B5473426BA907300F97107 /* ProgressController.m in Sources */ = {isa = PBXBuildFile; fileRef = 71B5473326BA907300F97107 /* ProgressController.m */; };
+		71BF8D6926BBE37100DEEAB4 /* PasswordPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 71BF8D6826BBE37100DEEAB4 /* PasswordPrompt.xib */; };
+		71BF8D6D26BBE38C00DEEAB4 /* PasswordPromptController.m in Sources */ = {isa = PBXBuildFile; fileRef = 71BF8D6B26BBE38C00DEEAB4 /* PasswordPromptController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,9 @@
 		71B5473026BA905000F97107 /* Progress.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Progress.xib; sourceTree = "<group>"; };
 		71B5473226BA907300F97107 /* ProgressController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressController.h; sourceTree = "<group>"; };
 		71B5473326BA907300F97107 /* ProgressController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProgressController.m; sourceTree = "<group>"; };
+		71BF8D6826BBE37100DEEAB4 /* PasswordPrompt.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PasswordPrompt.xib; sourceTree = "<group>"; };
+		71BF8D6A26BBE38C00DEEAB4 /* PasswordPromptController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PasswordPromptController.h; sourceTree = "<group>"; };
+		71BF8D6B26BBE38C00DEEAB4 /* PasswordPromptController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordPromptController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +86,9 @@
 				71B5473026BA905000F97107 /* Progress.xib */,
 				71B5473226BA907300F97107 /* ProgressController.h */,
 				71B5473326BA907300F97107 /* ProgressController.m */,
+				71BF8D6826BBE37100DEEAB4 /* PasswordPrompt.xib */,
+				71BF8D6A26BBE38C00DEEAB4 /* PasswordPromptController.h */,
+				71BF8D6B26BBE38C00DEEAB4 /* PasswordPromptController.m */,
 			);
 			path = ZipMan;
 			sourceTree = "<group>";
@@ -141,6 +149,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71BF8D6926BBE37100DEEAB4 /* PasswordPrompt.xib in Resources */,
 				71171D4B26BAE2EA0078F9EE /* Credits.rtf in Resources */,
 				71B5473126BA905000F97107 /* Progress.xib in Resources */,
 				7149599D26B9AC6700892725 /* Assets.xcassets in Resources */,
@@ -157,6 +166,7 @@
 			files = (
 				71B5473426BA907300F97107 /* ProgressController.m in Sources */,
 				714959A326B9AC6700892725 /* main.m in Sources */,
+				71BF8D6D26BBE38C00DEEAB4 /* PasswordPromptController.m in Sources */,
 				7149599B26B9AC6300892725 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

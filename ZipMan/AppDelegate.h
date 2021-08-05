@@ -9,6 +9,7 @@
 #include <zip.h>
 
 #import "ProgressController.h"
+#import "PasswordPromptController.h"
 
 @interface AppDelegate: NSObject <NSApplicationDelegate>
 
