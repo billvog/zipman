@@ -190,12 +190,20 @@ int onZipCancel(zip_t *zip, void *ud) {
 		
 		NSURL *selectedUrl = openDialog.URL;
 		NSString *inputPath = [selectedUrl path];
-		NSString *zipOutputPath = [NSString stringWithFormat:@"%@.zip", [selectedUrl path]];
+		
+		// Be sure to create a zip file that doesn't already exists
+		int zipOutputPathSuffixCount = 2;
+		NSURL *zipOutputUrl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@.zip", [selectedUrl path]]];
+		while ([zipOutputUrl checkResourceIsReachableAndReturnError:nil]) {
+			zipOutputUrl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@ %d.zip", [selectedUrl path], zipOutputPathSuffixCount++]];
+		}
+		
+		NSString *zipOutputPath = [zipOutputUrl path];
 		
 		@try {
 			NSString *Password = [self.EncryptionPasswordField stringValue];
 			NSString *RepeatedPassword = [self.EncryptionRepeatField stringValue];
-			
+
 			if (Password.length > 0) {
 				if (![Password isEqualToString:RepeatedPassword]) {
 					NSLog(@"Error verifying passwords: Passwords do not match");
@@ -205,16 +213,16 @@ int onZipCancel(zip_t *zip, void *ud) {
 			else {
 				Password = nil;
 			}
-			
+
 			// Init progress controller
 			self.progressController = [[ProgressController alloc] initWithWindowNibName:@"Progress"];
-			
+
 			// Create & Open zip
 			const char *cZipOutputPath = [zipOutputPath UTF8String];
-			
+
 			int error_code;
 			zip_error_t *error = malloc(sizeof(zip_error_t));
-			
+
 			zip_t *zip = zip_open(cZipOutputPath, ZIP_CREATE, &error_code);
 			if (zip == NULL) {
 				zip_error_init_with_code(error, error_code);
@@ -222,7 +230,7 @@ int onZipCancel(zip_t *zip, void *ud) {
 				NSLog(@"Error opening zip: %s", error_msg);
 				[NSException raise:@"Error opening zip" format:@"%s", error_msg];
 			}
-			
+
 			// Add directory
 			if (selectedUrl.hasDirectoryPath) {
 				[self WalkDirToZip:inputPath zipFile:zip
@@ -233,30 +241,30 @@ int onZipCancel(zip_t *zip, void *ud) {
 				[self ZipFile:inputPath zipFile:zip entryName:[selectedUrl lastPathComponent]
 					 password:Password];
 			}
-			
+
 			// Show progress window
 			[self.progressController showWindow:self];
 			NSWindow *progressWindow = [self.progressController window];
 			[progressWindow setTitle:[NSString stringWithFormat:@"Zipping \"%@\"", zipOutputPath]];
-			
+
 			// Register for progress callback
 			zip_register_progress_callback_with_state(zip, 0.0, onZipProgress, nil, (__bridge void *)(self));
-			
+
 			// Close & save zip
 			void (^zipCloseBlock)(void) = ^{
 				int res = zip_close(zip);
-				
+
 				// Close dialog
 				dispatch_sync(dispatch_get_main_queue(), ^{
 					[self.progressController close];
-					
+
 					NSAlert *alert = [[NSAlert alloc] init];
-					
+
 					// Check for errors
 					if (res == -1) {
 						const char *error_msg = zip_strerror(zip);
 						NSLog(@"Error closing zip: %s", error_msg);
-						
+
 						[alert setAlertStyle:NSAlertStyleCritical];
 						[alert setMessageText:@"Error closing zip"];
 						[alert setInformativeText:[NSString stringWithUTF8String:error_msg]];
@@ -265,11 +273,11 @@ int onZipCancel(zip_t *zip, void *ud) {
 						[alert setMessageText:@"Success"];
 						[alert setInformativeText:[NSString stringWithFormat:@"Zip created at \"%@\"", zipOutputPath]];
 					}
-					
+
 					[alert runModal];
 				});
 			};
-			
+
 			NSThread *zipCloseThread = [[NSThread alloc] initWithBlock:zipCloseBlock];
 			[zipCloseThread start];
 		} @catch (NSException *exception) {
