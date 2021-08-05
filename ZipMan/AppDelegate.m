@@ -598,16 +598,56 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 	_CompressionMethodIdx = CompressionMethodIdx;
 }
 
-- (IBAction)PasswordFieldChanged:(id)sender {
-	NSString *Password = [self.EncryptionPasswordField stringValue];
-	[_EncryptionRepeatField setEnabled:(Password.length > 0)];
-}
-
-- (IBAction)RepeatPasswordFieldChanged:(id)sender {
+- (void)CheckEncryptionEnabled {
 	NSString *Password = [self.EncryptionPasswordField stringValue];
 	NSString *RepPassword = [self.EncryptionRepeatField stringValue];
 	
-	[_EncryptionAlgorithmPopup setEnabled:[Password isEqualToString:RepPassword]];
+	bool isPasswordValid = Password.length > 0;
+	bool doPasswordsMatch = [Password isEqualToString:RepPassword];
+	
+	bool isEncryptionEnabled = FALSE;
+	
+	if (isPasswordValid) {
+		if (doPasswordsMatch) {
+			[self.EncryptionPasswordValidLock setImage:[NSImage imageWithSystemSymbolName:@"lock" accessibilityDescription:nil]];
+			[self.EncryptionRepeatValid setImage:[NSImage imageWithSystemSymbolName:@"checkmark.circle.fill" accessibilityDescription:nil]];
+			[self.EncryptionRepeatValid	 setContentTintColor:[NSColor systemGreenColor]];
+			
+			isEncryptionEnabled = TRUE;
+		}
+		else {
+			[self.EncryptionRepeatValid setImage:[NSImage imageWithSystemSymbolName:@"exclamationmark.circle.fill" accessibilityDescription:@"Passwords do not match"]];
+			[self.EncryptionRepeatValid	setContentTintColor:[NSColor systemOrangeColor]];
+		}
+	}
+	else {
+		[self.EncryptionRepeatValid setImage:nil];
+		[self.EncryptionPasswordValidLock setImage:[NSImage imageWithSystemSymbolName:@"lock.open" accessibilityDescription:nil]];
+	}
+	
+	if (isEncryptionEnabled != self.isEncryptionEnabled) {
+		self.isEncryptionEnabled = isEncryptionEnabled;
+		
+		NSString* path = [[NSBundle mainBundle] pathForResource:
+						  isEncryptionEnabled ? @"encryption_enabled" : @"encryption_disabled" ofType:@"mp3"];
+		NSURL* file = [NSURL fileURLWithPath:path];
+		
+		self.audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:file error:nil];
+		[self.audioPlayer prepareToPlay];
+		[self.audioPlayer play];
+		
+		NSLog(@"Encryption has been enabled");
+	}
+	
+	[_EncryptionAlgorithmPopup setEnabled:isEncryptionEnabled];
+}
+
+- (IBAction)PasswordFieldChanged:(id)sender {
+	[self CheckEncryptionEnabled];
+}
+
+- (IBAction)RepeatPasswordFieldChanged:(id)sender {
+	[self CheckEncryptionEnabled];
 }
 
 - (IBAction)EncryptionAlgorithmChanged:(id)sender {

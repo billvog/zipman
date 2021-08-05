@@ -12,6 +12,8 @@
 		7149599D26B9AC6700892725 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7149599C26B9AC6700892725 /* Assets.xcassets */; };
 		714959A026B9AC6700892725 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7149599E26B9AC6700892725 /* MainMenu.xib */; };
 		714959A326B9AC6700892725 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 714959A226B9AC6700892725 /* main.m */; };
+		715D6FD226BC5A3600BBC940 /* encryption_enabled.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 715D6FD126BC5A3600BBC940 /* encryption_enabled.mp3 */; };
+		715D6FD526BC5BDA00BBC940 /* encryption_disabled.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 715D6FD426BC5BDA00BBC940 /* encryption_disabled.mp3 */; };
 		71B5473126BA905000F97107 /* Progress.xib in Resources */ = {isa = PBXBuildFile; fileRef = 71B5473026BA905000F97107 /* Progress.xib */; };
 		71B5473426BA907300F97107 /* ProgressController.m in Sources */ = {isa = PBXBuildFile; fileRef = 71B5473326BA907300F97107 /* ProgressController.m */; };
 		71BF8D6926BBE37100DEEAB4 /* PasswordPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 71BF8D6826BBE37100DEEAB4 /* PasswordPrompt.xib */; };
@@ -19,7 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		71171D4A26BAE2EA0078F9EE /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = ZipMan/Resources/Credits.rtf; sourceTree = "<group>"; };
+		71171D4A26BAE2EA0078F9EE /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		7149599626B9AC6300892725 /* ZipMan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZipMan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7149599926B9AC6300892725 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		7149599A26B9AC6300892725 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -28,6 +30,8 @@
 		714959A126B9AC6700892725 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		714959A226B9AC6700892725 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		714959A426B9AC6700892725 /* ZipMan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZipMan.entitlements; sourceTree = "<group>"; };
+		715D6FD126BC5A3600BBC940 /* encryption_enabled.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = encryption_enabled.mp3; sourceTree = "<group>"; };
+		715D6FD426BC5BDA00BBC940 /* encryption_disabled.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = encryption_disabled.mp3; sourceTree = "<group>"; };
 		71B5473026BA905000F97107 /* Progress.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Progress.xib; sourceTree = "<group>"; };
 		71B5473226BA907300F97107 /* ProgressController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressController.h; sourceTree = "<group>"; };
 		71B5473326BA907300F97107 /* ProgressController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProgressController.m; sourceTree = "<group>"; };
@@ -47,15 +51,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		71171D4C26BAE2F50078F9EE /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				71171D4A26BAE2EA0078F9EE /* Credits.rtf */,
-			);
-			name = Resources;
-			path = ..;
-			sourceTree = "<group>";
-		};
 		7149598D26B9AC6300892725 = {
 			isa = PBXGroup;
 			children = (
@@ -75,7 +70,7 @@
 		7149599826B9AC6300892725 /* ZipMan */ = {
 			isa = PBXGroup;
 			children = (
-				71171D4C26BAE2F50078F9EE /* Resources */,
+				715D6FD326BC5A5A00BBC940 /* Resources */,
 				7149599926B9AC6300892725 /* AppDelegate.h */,
 				7149599A26B9AC6300892725 /* AppDelegate.m */,
 				7149599C26B9AC6700892725 /* Assets.xcassets */,
@@ -91,6 +86,16 @@
 				71BF8D6B26BBE38C00DEEAB4 /* PasswordPromptController.m */,
 			);
 			path = ZipMan;
+			sourceTree = "<group>";
+		};
+		715D6FD326BC5A5A00BBC940 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				715D6FD426BC5BDA00BBC940 /* encryption_disabled.mp3 */,
+				715D6FD126BC5A3600BBC940 /* encryption_enabled.mp3 */,
+				71171D4A26BAE2EA0078F9EE /* Credits.rtf */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -149,6 +154,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				715D6FD526BC5BDA00BBC940 /* encryption_disabled.mp3 in Resources */,
+				715D6FD226BC5A3600BBC940 /* encryption_enabled.mp3 in Resources */,
 				71BF8D6926BBE37100DEEAB4 /* PasswordPrompt.xib in Resources */,
 				71171D4B26BAE2EA0078F9EE /* Credits.rtf in Resources */,
 				71B5473126BA905000F97107 /* Progress.xib in Resources */,

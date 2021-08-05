@@ -6,6 +6,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <AVFoundation/AVFoundation.h>
 #include <zip.h>
 
 #import "ProgressController.h"
@@ -19,6 +20,9 @@
 
 @property (nonatomic, retain) NSArray* encryptionAlgorithms;
 @property (nonatomic) int EncryptionAlgorithmIdx;
+@property (nonatomic) BOOL isEncryptionEnabled;
+
+@property AVAudioPlayer* audioPlayer;
 
 // UI Elements
 @property (strong) IBOutlet NSTextField *CompressionMethodText;
@@ -26,10 +30,14 @@
 @property (strong) IBOutlet NSSecureTextField *EncryptionPasswordField;
 @property (strong) IBOutlet NSSecureTextField *EncryptionRepeatField;
 @property (strong) IBOutlet NSPopUpButton *EncryptionAlgorithmPopup;
+@property (strong) IBOutlet NSImageView *EncryptionPasswordValidLock;
+@property (strong) IBOutlet NSImageView *EncryptionRepeatValid;
 
 @property ProgressController *progressController;
 
 // Functions
+- (void)CheckEncryptionEnabled;
+
 - (void)ZipFile:(NSString*)file
 		zipFile:(zip_t*)zip
 	  entryName:(NSString*)entry
