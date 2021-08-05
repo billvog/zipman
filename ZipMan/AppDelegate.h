@@ -44,8 +44,8 @@
 			password:(NSString*)password;
 
 // Zip events
-void onZipProgress(zip_t *zip, double progress, void *ud);
-int onZipCancel(zip_t *zip, void *ud);
+void onZipCloseProgress(zip_t *zip, double progress, void *ud);
+int onZipCloseCancel(zip_t *zip, void *ud);
 
 // Menu events
 - (IBAction)FileMenuCreateArchiveClicked:(id)sender;

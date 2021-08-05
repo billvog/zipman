@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ProgressController: NSWindowController
 
+@property (readonly) NSDate *lastUpdatedProgress;
 @property (readonly) BOOL isCanceled;
 
 @property (strong) IBOutlet NSProgressIndicator *ProgressIndicator;

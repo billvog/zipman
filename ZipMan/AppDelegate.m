@@ -15,9 +15,11 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	// Compression settings
-	self.CompressionMethodIdx = 3;
+	self.CompressionMethodIdx = 4;
 	self.compressionMethods = [[NSArray alloc] initWithObjects:
-							   @"None", @"BZIP2", @"Deflate (default)", @"XZ", @"ZSTD", nil];
+							   @"Store, without compression", @"Very fast, less compression",
+							   @"Fast, less compression", @"Normal", @"Slow, a lot of compression",
+							   @"Very slow, the best compression", nil];
 	
 	// Encryption settings
 	self.EncryptionAlgorithmIdx = 0;
@@ -61,29 +63,37 @@
 	}
 	
 	zip_int32_t CompressionMethod;
-	switch (self.CompressionMethodIdx) {
+	if (self.CompressionMethodIdx == 0) {
+		CompressionMethod = ZIP_CM_STORE;
+	}
+	else {
+		CompressionMethod = ZIP_CM_DEFLATE;
+	}
+	
+	zip_uint32_t CompressionLevel;
+	switch (CompressionMethod) {
 		case 1:
-			CompressionMethod = ZIP_CM_STORE;
+			CompressionLevel = 1;
 			break;
 		case 2:
-			CompressionMethod = ZIP_CM_BZIP2;
+			CompressionLevel = 3;
 			break;
 		case 3:
-			CompressionMethod = ZIP_CM_DEFLATE;
+			CompressionLevel = 5;
 			break;
 		case 4:
-			CompressionMethod = ZIP_CM_XZ;
+			CompressionLevel = 7;
 			break;
 		case 5:
-			CompressionMethod = ZIP_CM_ZSTD;
+			CompressionLevel = 9;
 			break;
 		default:
-			CompressionMethod = ZIP_CM_DEFAULT;
+			CompressionLevel = 0;
 			break;
 	}
 	
 	// Apply compression
-	int res = zip_set_file_compression(zip, index, CompressionMethod, 0);
+	int res = zip_set_file_compression(zip, index, CompressionMethod, CompressionLevel);
 	if (res != 0) {
 		zip_source_free(source);
 		const char *error_msg = zip_strerror(zip);
@@ -155,7 +165,7 @@
 	}];
 }
 
-void onZipProgress(zip_t *zip, double progress, void *ud) {
+void onZipCloseProgress(zip_t *zip, double progress, void *ud) {
 	float ProgressFormed = (float)(progress * 100.0);
 	
 	AppDelegate* _self = (__bridge AppDelegate*)(ud);
@@ -163,7 +173,7 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 		dispatch_async(dispatch_get_main_queue(), ^{
 			ProgressController *progressController = _self.progressController;
 			if (progressController.isCanceled) {
-				zip_register_cancel_callback_with_state(zip, &onZipCancel, nil, (__bridge void*)_self);
+				zip_register_cancel_callback_with_state(zip, &onZipCloseCancel, nil, (__bridge void*)_self);
 				return;
 			}
 				
@@ -172,7 +182,7 @@ void onZipProgress(zip_t *zip, double progress, void *ud) {
 	}
 }
 
-int onZipCancel(zip_t *zip, void *ud) {
+int onZipCloseCancel(zip_t *zip, void *ud) {
 	NSLog(@"Canceling zip_close...");
 	return 1;
 }
@@ -214,9 +224,6 @@ int onZipCancel(zip_t *zip, void *ud) {
 				Password = nil;
 			}
 
-			// Init progress controller
-			self.progressController = [[ProgressController alloc] initWithWindowNibName:@"Progress"];
-
 			// Create & Open zip
 			const char *cZipOutputPath = [zipOutputPath UTF8String];
 
@@ -243,14 +250,14 @@ int onZipCancel(zip_t *zip, void *ud) {
 			}
 
 			// Show progress window
+			self.progressController = [[ProgressController alloc] initWithWindowNibName:@"Progress"];
 			[self.progressController showWindow:self];
-			NSWindow *progressWindow = [self.progressController window];
-			[progressWindow setTitle:[NSString stringWithFormat:@"Zipping \"%@\"", zipOutputPath]];
+			[[self.progressController window] setTitle:[NSString stringWithFormat:@"Zipping \"%@\"", zipOutputPath]];
 
 			// Register for progress callback
-			zip_register_progress_callback_with_state(zip, 0.0, onZipProgress, nil, (__bridge void *)(self));
+			zip_register_progress_callback_with_state(zip, 0.0, onZipCloseProgress, nil, (__bridge void *)(self));
 
-			// Close & save zip
+			// Close & save zip (in seperate thread)
 			void (^zipCloseBlock)(void) = ^{
 				int res = zip_close(zip);
 
@@ -328,52 +335,67 @@ int onZipCancel(zip_t *zip, void *ud) {
 			zip_int64_t entries_num = zip_get_num_entries(zip, 0);
 			NSLog(@"Found %lld entries in zip", entries_num);
 			
-			// Check if is encrypted
-			zip_stat_t *stat = malloc(sizeof(zip_stat_t));
-			int res = zip_stat_index(zip, 0, 0, stat);
-			if (res == -1) {
-				const char *error_msg = zip_strerror(zip);
-				NSLog(@"Cannot stat first entry: %s", error_msg);
-				[NSException raise:@"Error statting entry in zip" format:@"%s", error_msg];
+			bool cancelOperation = FALSE;
+			bool askedForPassword = FALSE;
+			
+			// Loop though all entries in archive to calculate the size of them
+			// and check if there is any encrypted one.
+			zip_uint64_t total_zip_size = 0u;
+			for (zip_int64_t idx = 0; idx < entries_num; idx++) {
+				zip_stat_t *stat = malloc(sizeof(zip_stat_t));
+				int res = zip_stat_index(zip, idx, 0, stat);
+				if (res == -1) {
+					NSLog(@"Cannot stat entry at index: %lld", idx);
+					continue;
+				}
+				
+				total_zip_size += stat->size;
+				
+				// Also, check if is encrypted
+				if (stat->encryption_method != ZIP_EM_NONE && !askedForPassword) {
+					NSLog(@"Archive is encrypted with mode: %d", stat->encryption_method);
+					
+					// Show password prompt
+					PasswordPromptController *pwdPromptCtrl = [[PasswordPromptController alloc] initWithWindowNibName:@"PasswordPrompt"];
+					bool isFirst = TRUE;
+					do {
+						if (!isFirst) {
+							// Show wrong password alert
+							NSAlert *alert = [[NSAlert alloc] init];
+							[alert setAlertStyle:NSAlertStyleCritical];
+							[alert setMessageText:@"Incorrect password"];
+							[alert setInformativeText:@"The provided password does not match the password used for encryption."];
+							[alert runModal];
+						}
+						
+						// Show PasswordPrompt as sheet
+						[self.window beginSheet:pwdPromptCtrl.window completionHandler:nil];
+						NSModalResponse returnCode = [NSApp runModalForWindow:pwdPromptCtrl.window];
+						
+						// Check response
+						if (returnCode != NSModalResponseOK) {
+							cancelOperation = TRUE;
+							break;
+						}
+						
+						// Set password
+						const char *password = [[pwdPromptCtrl GetPassword] UTF8String];
+						zip_set_default_password(zip, password);
+						
+						[NSApp endSheet: pwdPromptCtrl.window];
+						[pwdPromptCtrl.window orderOut:self];
+						
+						isFirst = FALSE;
+						askedForPassword = TRUE;
+					} while (zip_fopen_index(zip, idx, 0) == NULL);
+				}
+				
+				if (cancelOperation)
+					break;
 			}
 			
-			if (stat->encryption_method != ZIP_EM_NONE) {
-				NSLog(@"Archive is encrypted with mode: %d", stat->encryption_method);
-				
-				// Show password prompt
-				PasswordPromptController *pwdPromptCtrl = [[PasswordPromptController alloc] initWithWindowNibName:@"PasswordPrompt"];
-				bool isFirst = TRUE;
-				do {
-					if (!isFirst) {
-						// Show wrong password alert
-						NSAlert *alert = [[NSAlert alloc] init];
-						[alert setAlertStyle:NSAlertStyleCritical];
-						[alert setMessageText:@"Incorrect password"];
-						[alert setInformativeText:@"The provided password does not match the password used for encryption."];
-						[alert runModal];
-					}
-					
-					// Show PasswordPrompt as sheet
-					[self.window beginSheet:pwdPromptCtrl.window completionHandler:nil];
-					NSModalResponse returnCode = [NSApp runModalForWindow:pwdPromptCtrl.window];
-					
-					// Check response
-					if (returnCode != NSModalResponseOK) {
-						return;
-					}
-					
-					// Set password
-					const char *password = [[pwdPromptCtrl GetPassword] UTF8String];
-					zip_set_default_password(zip, password);
-					
-					NSLog(@"Password setted to: %s", password);
-					
-					[NSApp endSheet: pwdPromptCtrl.window];
-					[pwdPromptCtrl.window orderOut:self];
-					
-					isFirst = FALSE;
-				} while (zip_fopen_index(zip, 0, 0) == NULL);
-			}
+			if (cancelOperation)
+				return;
 			
 			// Choose output path
 			if (entries_num == 1) {
@@ -383,7 +405,8 @@ int onZipCancel(zip_t *zip, void *ud) {
 				int outputPathSuffixCount = 2;
 				NSURL *outputUrl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@", selectedPathWithoutExt]];
 				while ([outputUrl checkResourceIsReachableAndReturnError:nil]) {
-					outputUrl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@ %d", selectedPathWithoutExt, outputPathSuffixCount++]];
+					outputUrl = [NSURL fileURLWithPath:
+								 [NSString stringWithFormat:@"%@ %d", selectedPathWithoutExt, outputPathSuffixCount++]];
 				}
 				
 				outputPath = [outputUrl path];
@@ -396,97 +419,160 @@ int onZipCancel(zip_t *zip, void *ud) {
 				}
 			}
 			
-			// Extract all entries
-			for (zip_int64_t idx = 0; idx < entries_num; idx++) {
-				zip_stat_t *stat = malloc(sizeof(zip_stat_t));
+			// Show progress window
+			self.progressController = [[ProgressController alloc] initWithWindowNibName:@"Progress"];
+			[self.progressController showWindow:self];
+			[[self.progressController window] setTitle:[NSString stringWithFormat:@"Extracting \"%@\"", zipPath]];
+
+			// Extract all entries (in seperate thread)
+			void (^zipExtractBlock)(void) = ^{
+				NSError *error;
+				zip_uint64_t total_size_read = 0u;
+				bool isCanceled = FALSE;
 				
-				int res = zip_stat_index(zip, idx, 0, stat);
-				if (res == -1) {
-					NSLog(@"Cannot stat entry at index: %lld", idx);
-					continue;
-				}
-				
-				bool isFolder = stat->name[strlen(stat->name) - 1] == '/';
-				NSString *currOutputPath;
-				if (entries_num == 1) {
-					currOutputPath = outputPath;
-				}
-				else {
-					currOutputPath = [NSString stringWithFormat:@"%@/%s", outputPath, stat->name];
-				}
-				
-				const char *cOutputPath = [currOutputPath UTF8String];
-				
-				if (isFolder) {
-					// If entry is folder then just create a folder
-					bool okMkdir = [[NSFileManager defaultManager] createDirectoryAtPath:currOutputPath withIntermediateDirectories:YES attributes:nil error:&error];
-					if (!okMkdir) {
-						NSLog(@"Error creating folder at %@: %@", outputPath, error.localizedDescription);
-						[NSException raise:@"Error creating folder at %@" format:@"%@", error.localizedDescription];
-					}
-					
-					NSLog(@"Created folder: %s", stat->name);
-				}
-				else {
-					// Create all parent folders
-					NSString *outputParentFolders = [currOutputPath stringByDeletingLastPathComponent];
-					bool okMkdir = [[NSFileManager defaultManager] createDirectoryAtPath:outputParentFolders withIntermediateDirectories:YES attributes:nil error:&error];
-					if (!okMkdir) {
-						NSLog(@"Error creating folder at %@: %@", outputPath, error.localizedDescription);
-						[NSException raise:@"Error creating folder at %@" format:@"%@", error.localizedDescription];
-					}
-					
-					// Open output file
-					FILE *fp = fopen(cOutputPath, "wb");
-					if (fp == NULL) {
-						NSLog(@"Cannot write to file: %s", cOutputPath);
-						continue;
-					}
-					
-					// Open file in zip
-					zip_file_t *file = zip_fopen_index(zip, idx, 0);
-					if (file == NULL) {
-						const char *error_msg = zip_strerror(zip);
-						NSLog(@"Error accessing file in archive: %s", error_msg);
-						[NSException raise:@"Error accessing file in archive" format:@"%s", error_msg];
-					}
-					
-					// Write file to output
-					zip_uint64_t bytes_left = stat->size;
-					zip_uint64_t readchunk_size = 524288u;
-					char buffer[readchunk_size];
-					
-					while (bytes_left > 0) {
-						if (readchunk_size > bytes_left)
-							readchunk_size = bytes_left;
+				@try {
+					for (zip_int64_t idx = 0; idx < entries_num; idx++) {
+						zip_stat_t *stat = malloc(sizeof(zip_stat_t));
 						
-						zip_int64_t bytes_read = zip_fread(file, buffer, readchunk_size);
-						bytes_left -= bytes_read;
+						int res = zip_stat_index(zip, idx, 0, stat);
+						if (res == -1) {
+							NSLog(@"Cannot stat entry at index: %lld", idx);
+							continue;
+						}
 						
-						fwrite(buffer, readchunk_size, 1, fp);
+						bool isFolder = stat->name[strlen(stat->name) - 1] == '/';
+						NSString *currOutputPath;
+						if (entries_num == 1) {
+							currOutputPath = outputPath;
+						}
+						else {
+							currOutputPath = [NSString stringWithFormat:@"%@/%s", outputPath, stat->name];
+						}
+						
+						const char *cOutputPath = [currOutputPath UTF8String];
+						
+						if (isFolder) {
+							// If entry is folder then just create a folder
+							bool okMkdir = [[NSFileManager defaultManager] createDirectoryAtPath:currOutputPath withIntermediateDirectories:YES attributes:nil error:&error];
+							if (!okMkdir) {
+								NSLog(@"Error creating folder at %@: %@", outputPath, error.localizedDescription);
+								[NSException raise:@"Error creating folder at %@" format:@"%@", error.localizedDescription];
+							}
+							
+							NSLog(@"Created folder: %s", stat->name);
+						}
+						else {
+							// Create all parent folders
+							NSString *outputParentFolders = [currOutputPath stringByDeletingLastPathComponent];
+							bool okMkdir = [[NSFileManager defaultManager] createDirectoryAtPath:outputParentFolders withIntermediateDirectories:YES attributes:nil error:&error];
+							if (!okMkdir) {
+								NSLog(@"Error creating folder at %@: %@", outputPath, error.localizedDescription);
+								[NSException raise:@"Error creating folder at %@" format:@"%@", error.localizedDescription];
+							}
+							
+							// Open output file
+							FILE *fp = fopen(cOutputPath, "wb");
+							if (fp == NULL) {
+								NSLog(@"Cannot write to file: %s", cOutputPath);
+								continue;
+							}
+							
+							// Open file in zip
+							zip_file_t *file = zip_fopen_index(zip, idx, 0);
+							if (file == NULL) {
+								const char *error_msg = zip_strerror(zip);
+								NSLog(@"Error accessing file %s [%lld]: %s", stat->name, idx, error_msg);
+								[NSException raise:@"Error accessing file in archive" format:@"%s", error_msg];
+							}
+							
+							// Write file to output
+							zip_uint64_t bytes_left = stat->size;
+							zip_uint64_t readchunk_size = 524288u;
+							char buffer[readchunk_size];
+							
+							while (bytes_left > 0) {
+								if (isCanceled)
+									break;
+								
+								if (readchunk_size > bytes_left)
+									readchunk_size = bytes_left;
+								
+								zip_int64_t bytes_read = zip_fread(file, buffer, readchunk_size);
+								bytes_left -= bytes_read;
+								total_size_read += bytes_read;
+								
+								fwrite(buffer, readchunk_size, 1, fp);
+								
+								// Calculate progress
+								float progress = ((float) total_size_read / (float) total_zip_size) * 100.0;
+								dispatch_sync(dispatch_get_main_queue(), ^{
+									[self.progressController UpdateProgress:progress];
+								});
+								
+								if ([self.progressController isCanceled]) {
+									isCanceled = TRUE;
+									NSLog(@"Operation canceled!");
+								}
+							}
+							
+							// Release resources
+							fclose(fp);
+							zip_fclose(file);
+							
+							if (isCanceled)
+								break;
+							
+							NSLog(@"Created file: %s", stat->name);
+						}
+					}
+				} @catch (NSException *exception) {
+					dispatch_sync(dispatch_get_main_queue(), ^{
+						NSAlert *alert = [[NSAlert alloc] init];
+						[alert setAlertStyle:NSAlertStyleCritical];
+						[alert setMessageText:exception.name];
+						[alert setInformativeText:exception.reason];
+						[alert runModal];
+					});
+					
+					return;
+				}
+				@finally{
+					zip_close(zip);
+					
+					dispatch_sync(dispatch_get_main_queue(), ^{
+						[self.progressController close];
+					});
+				}
+				
+				if (isCanceled) {
+					NSLog(@"Cancelling operation...");
+					
+					// Delete output dir
+					bool okRmOutput = [[NSFileManager defaultManager] removeItemAtPath:outputPath error:&error];
+					if (!okRmOutput) {
+						NSLog(@"Couldn't remove output directory: %@", outputPath);
 					}
 					
-					// Release resources
-					fclose(fp);
-					zip_fclose(file);
-					
-					NSLog(@"Created file: %s", stat->name);
+					return;
 				}
-			}
+				
+				dispatch_sync(dispatch_get_main_queue(), ^{
+					NSAlert *alert = [[NSAlert alloc] init];
+					[alert setMessageText:@"Success"];
+					[alert setInformativeText:[NSString stringWithFormat:@"Zip extracted at %@", outputPath]];
+					[alert runModal];
+				});
+			};
 			
+			NSThread *zipExtractThread = [[NSThread alloc] initWithBlock:zipExtractBlock];
+			[zipExtractThread start];
 		} @catch (NSException *exception) {
 			NSAlert *alert = [[NSAlert alloc] init];
 			[alert setAlertStyle:NSAlertStyleCritical];
 			[alert setMessageText:exception.name];
 			[alert setInformativeText:exception.reason];
 			[alert runModal];
-			return;
 		}
-		
-		NSAlert *alert = [[NSAlert alloc] init];
-		[alert setMessageText:@"Success"];
-		[alert setInformativeText:[NSString stringWithFormat:@"Zip extracted at %@", outputPath]];
-		[alert runModal];
 	}];
 }
 
