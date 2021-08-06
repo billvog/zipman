@@ -153,6 +153,13 @@
 	NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL];
 	[dirs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 		NSString *filename = (NSString *)obj;
+		
+		if ([self.WithoutMacResForksCheckbox state] == NSControlStateValueOn &&
+			[filename isEqualToString:@".DS_Store"]) {
+			NSLog(@"Skipping %@ because WithoutMacResForksCheckbox is checked", filename);
+			return;
+		}
+		
 		NSString *entryName = [NSString stringWithFormat:@"%@/%@", baseEntry, filename];
 		NSString *full_path = [NSString stringWithFormat:@"%@/%@", path, filename];
 		NSURL *fileUrl = [NSURL fileURLWithPath:full_path];
@@ -288,8 +295,23 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 						[alert setInformativeText:[NSString stringWithUTF8String:error_msg]];
 					}
 					else {
-						[alert setMessageText:@"Success"];
-						[alert setInformativeText:[NSString stringWithFormat:@"Zip created at \"%@\"", zipOutputPath]];
+						bool isSuccess = true;
+						if (self.DelAfterCompCheckbox.state == NSControlStateValueOn) {
+							NSLog(@"Deleting input files because DelAfterCompCheckbox is checked");
+							
+							NSError *error;
+							isSuccess = [[NSFileManager defaultManager] removeItemAtPath:inputPath error:&error];
+							if (!isSuccess) {
+								[alert setAlertStyle:NSAlertStyleCritical];
+								[alert setMessageText:@"Error deleting input files"];
+								[alert setInformativeText:error.localizedDescription];
+							}
+						}
+						
+						if (isSuccess) {
+							[alert setMessageText:@"Success"];
+							[alert setInformativeText:[NSString stringWithFormat:@"Zip created at \"%@\"", zipOutputPath]];
+						}
 					}
 
 					[alert runModal];
@@ -347,11 +369,10 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 			zip_int64_t entries_num = zip_get_num_entries(zip, 0);
 			NSLog(@"Found %lld entries in zip", entries_num);
 			
-			bool cancelOperation = FALSE;
 			bool askedForPassword = FALSE;
 			
 			zip_uint64_t total_zip_size = 0u;
-			NSArray *entryPrefixes;
+			NSString *commonEntriesPrefix;
 			
 			// Loop though all entries in archive to check some things
 			// before extracting
@@ -370,19 +391,13 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 				// then use that prefix to extract them all the root output path
 				if (idx == 0) {
 					NSString *entryName = [NSString stringWithUTF8String:stat->name];
-					entryPrefixes = [entryName componentsSeparatedByString:@"/"];
+					commonEntriesPrefix = [entryName componentsSeparatedByString:@"/"][0];
 				}
 				else {
 					NSString *entryName = [NSString stringWithUTF8String:stat->name];
-					NSArray *entryNameParts = [entryName componentsSeparatedByString:@"/"];
-					
-					for (int i = 0; i < entryPrefixes.count; i++) {
-						if (![entryNameParts[i] isEqualToString:entryPrefixes[i]]) {
-							NSRange range = { 0, i };
-							entryPrefixes = [entryPrefixes subarrayWithRange:range];
-							break;
-						}
-					}
+					NSString *entryPrefix = [entryName componentsSeparatedByString:@"/"][0];
+					if (![entryPrefix isEqualToString:commonEntriesPrefix])
+						commonEntriesPrefix = nil;
 				}
 				
 				// Check if is encrypted
@@ -408,8 +423,7 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 						
 						// Check response
 						if (returnCode != NSModalResponseOK) {
-							cancelOperation = TRUE;
-							break;
+							[NSException raise:@"" format:@""];
 						}
 						
 						// Set password
@@ -423,13 +437,11 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 						askedForPassword = TRUE;
 					} while (zip_fopen_index(zip, idx, 0) == NULL);
 				}
-				
-				if (cancelOperation)
-					break;
 			}
 			
-			if (cancelOperation)
-				return;
+			if (commonEntriesPrefix != nil) {
+				NSLog(@"Found common entries prefix: %@", commonEntriesPrefix);
+			}
 			
 			// Choose output path
 			if (entries_num == 1) {
@@ -482,11 +494,7 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 						}
 						else {
 							NSString *entryName = [NSString stringWithUTF8String:stat->name];
-							NSArray *entryNameParts = [entryName componentsSeparatedByString:@"/"];
-							
-							NSRange range = { entryPrefixes.count, entryNameParts.count - entryPrefixes.count };
-							entryNameParts = [entryNameParts subarrayWithRange:range];
-							entryName = [entryNameParts componentsJoinedByString:@"/"];
+							entryName = [entryName substringFromIndex:commonEntriesPrefix.length + 1];
 							
 							currOutputPath = [NSString stringWithFormat:@"%@/%@", outputPath, entryName];
 						}
@@ -617,11 +625,13 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 			NSThread *zipExtractThread = [[NSThread alloc] initWithBlock:zipExtractBlock];
 			[zipExtractThread start];
 		} @catch (NSException *exception) {
-			NSAlert *alert = [[NSAlert alloc] init];
-			[alert setAlertStyle:NSAlertStyleCritical];
-			[alert setMessageText:exception.name];
-			[alert setInformativeText:exception.reason];
-			[alert runModal];
+			if (exception.name.length > 0 && exception.reason.length > 0) {
+				NSAlert *alert = [[NSAlert alloc] init];
+				[alert setAlertStyle:NSAlertStyleCritical];
+				[alert setMessageText:exception.name];
+				[alert setInformativeText:exception.reason];
+				[alert runModal];
+			}
 		}
 	}];
 }

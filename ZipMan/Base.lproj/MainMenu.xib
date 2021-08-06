@@ -16,11 +16,13 @@
             <connections>
                 <outlet property="CompressionMethodSlider" destination="vd2-pu-y9F" id="EYk-TN-LAC"/>
                 <outlet property="CompressionMethodText" destination="lNL-os-e8F" id="58q-Ch-wyh"/>
+                <outlet property="DelAfterCompCheckbox" destination="o9L-pH-nWa" id="Y1l-Nj-3aC"/>
                 <outlet property="EncryptionAlgorithmPopup" destination="p51-nJ-TTh" id="Ftq-jO-SU6"/>
                 <outlet property="EncryptionPasswordField" destination="c7Z-Yj-Tbk" id="PqR-5y-5L8"/>
                 <outlet property="EncryptionPasswordValidLock" destination="YDC-BJ-mgd" id="cdl-xj-Aph"/>
                 <outlet property="EncryptionRepeatField" destination="6qQ-0F-fu0" id="HZz-6H-Bkn"/>
                 <outlet property="EncryptionRepeatValid" destination="EPp-BA-sdo" id="Eqb-2l-t5E"/>
+                <outlet property="WithoutMacResForksCheckbox" destination="X2B-Hl-FAA" id="hTR-K6-3JM"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -184,7 +186,7 @@
                                                 <gridCells>
                                                     <gridCell row="PBd-we-kis" column="HQg-j7-dKx" id="9VR-WL-HKm">
                                                         <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Xs-oi-Wf1">
-                                                            <rect key="frame" x="-2" y="68" width="82" height="16"/>
+                                                            <rect key="frame" x="-2" y="70" width="82" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Password:" id="vtn-rA-cdu">
                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -194,7 +196,7 @@
                                                     </gridCell>
                                                     <gridCell row="PBd-we-kis" column="cDy-t5-K8C" id="faQ-9d-3xY">
                                                         <secureTextField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="c7Z-Yj-Tbk">
-                                                            <rect key="frame" x="84" y="65" width="284" height="21"/>
+                                                            <rect key="frame" x="84" y="70" width="284" height="16"/>
                                                             <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="OlM-ly-ivc">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -207,13 +209,13 @@
                                                     </gridCell>
                                                     <gridCell row="PBd-we-kis" column="9CF-4e-dC5" id="58N-uR-uAE">
                                                         <imageView key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="YDC-BJ-mgd">
-                                                            <rect key="frame" x="374" y="68.5" width="19.5" height="15"/>
+                                                            <rect key="frame" x="374" y="71.5" width="19.5" height="15"/>
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lock.open" catalog="system" id="xEa-Ne-Puf"/>
                                                         </imageView>
                                                     </gridCell>
                                                     <gridCell row="C8b-n5-Q3A" column="HQg-j7-dKx" id="O2R-2V-lVd">
                                                         <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Mb-7G-8iR">
-                                                            <rect key="frame" x="-2" y="35" width="82" height="16"/>
+                                                            <rect key="frame" x="-2" y="37" width="82" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Repeat:" id="ucN-sK-xmR">
                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -223,7 +225,7 @@
                                                     </gridCell>
                                                     <gridCell row="C8b-n5-Q3A" column="cDy-t5-K8C" rowAlignment="lastBaseline" id="bQa-Xh-B5N">
                                                         <secureTextField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6qQ-0F-fu0">
-                                                            <rect key="frame" x="84" y="32" width="284" height="21"/>
+                                                            <rect key="frame" x="84" y="35" width="284" height="21"/>
                                                             <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="eOK-5T-X2N">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -236,7 +238,7 @@
                                                     </gridCell>
                                                     <gridCell row="C8b-n5-Q3A" column="9CF-4e-dC5" id="N2u-aU-ZXB">
                                                         <imageView key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="EPp-BA-sdo">
-                                                            <rect key="frame" x="374" y="32" width="19" height="21"/>
+                                                            <rect key="frame" x="374" y="32" width="19" height="26"/>
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="9CT-lE-ala"/>
                                                             <color key="contentTintColor" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
                                                         </imageView>

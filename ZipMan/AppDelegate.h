@@ -32,6 +32,8 @@
 @property (strong) IBOutlet NSPopUpButton *EncryptionAlgorithmPopup;
 @property (strong) IBOutlet NSImageView *EncryptionPasswordValidLock;
 @property (strong) IBOutlet NSImageView *EncryptionRepeatValid;
+@property (strong) IBOutlet NSButton *WithoutMacResForksCheckbox;
+@property (strong) IBOutlet NSButton *DelAfterCompCheckbox;
 
 @property ProgressController *progressController;
 
