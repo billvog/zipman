@@ -501,7 +501,7 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 						}
 						
 						dispatch_sync(dispatch_get_main_queue(), ^{
-							[self.progressController setTaskDescription:[NSString stringWithFormat:@"Extracting \"%@\"...", currOutputPath]];
+							[self.progressController setTaskDescription:[NSString stringWithFormat:@"Extracting \"%@\"", currOutputPath]];
 						});
 						
 						const char *cOutputPath = [currOutputPath UTF8String];
