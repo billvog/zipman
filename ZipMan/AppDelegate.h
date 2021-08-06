@@ -12,6 +12,10 @@
 #import "ProgressController.h"
 #import "PasswordPromptController.h"
 
+// Preferences keys
+#define ExcludeMacResForksPrefKey 	@"ExcludeMacResForks"
+#define DelFilesAfterCompPrefKey 	@"DeleteFilesAfterCompression"
+
 @interface AppDelegate: NSObject <NSApplicationDelegate, NSTextFieldDelegate>
 
 // Variables
@@ -38,6 +42,8 @@
 @property ProgressController *progressController;
 
 // Functions
+- (void)LoadPrefs;
+
 - (void)CheckEncryptionEnabled;
 
 - (void)ZipFile:(NSString*)file
@@ -62,6 +68,8 @@ int onZipCloseCancel(zip_t *zip, void *ud);
 // Main Window Events
 - (IBAction)CompressionMethodSliderChanged:(id)sender;
 - (IBAction)EncryptionAlgorithmChanged:(id)sender;
+- (IBAction)ExcludeMacResForksCheckboxChanged:(id)sender;
+- (IBAction)DelAfterCompCheckboxChanged:(id)sender;
 
 @end
 

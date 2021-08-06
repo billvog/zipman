@@ -31,6 +31,9 @@
 	
 	self.EncryptionPasswordField.delegate = self;
 	self.EncryptionRepeatField.delegate = self;
+	
+	// Load preferences
+	[self LoadPrefs];
 }
 
 
@@ -40,6 +43,18 @@
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
 	return TRUE;
+}
+
+- (void)LoadPrefs {
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	
+	// Get prefs
+	BOOL ExcludeMacResForks = [userDefaults boolForKey:ExcludeMacResForksPrefKey];
+	BOOL DelFilesAfterComp = [userDefaults boolForKey:DelFilesAfterCompPrefKey];
+	
+	// Apply them to the UI
+	[self.ExcludeMacResForksCheckbox setState:ExcludeMacResForks ? NSControlStateValueOn : NSControlStateValueOff];
+	[self.DelAfterCompCheckbox setState:DelFilesAfterComp ? NSControlStateValueOn : NSControlStateValueOff];
 }
 
 - (void)ZipFile:(NSString*)file
@@ -727,6 +742,16 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 	
 	NSLog(@"Changed encryption algorithm: %i (%@)", SelectedEncAlgorithmIdx, _encryptionAlgorithms[SelectedEncAlgorithmIdx]);
 	_EncryptionAlgorithmIdx = SelectedEncAlgorithmIdx;
+}
+
+- (IBAction)ExcludeMacResForksCheckboxChanged:(id)sender {
+	[[NSUserDefaults standardUserDefaults] setBool:
+	 self.ExcludeMacResForksCheckbox.state == NSControlStateValueOn forKey:ExcludeMacResForksPrefKey];
+}
+
+- (IBAction)DelAfterCompCheckboxChanged:(id)sender {
+	[[NSUserDefaults standardUserDefaults] setBool:
+	 self.DelAfterCompCheckbox.state == NSControlStateValueOn forKey:DelFilesAfterCompPrefKey];
 }
 
 @end
