@@ -193,7 +193,11 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 	NSOpenPanel *openDialog = [NSOpenPanel openPanel];
 	[openDialog setCanChooseFiles:true];
 	[openDialog setCanChooseDirectories:true];
+	[openDialog setMessage:@"Choose files or folders to archive"];
 	[openDialog setPrompt:@"Archive"];
+	
+//	TODO
+//	[openDialog setAllowsMultipleSelection:TRUE];
 	
 	[openDialog beginWithCompletionHandler:^(NSModalResponse result) {
 		if (result != NSModalResponseOK) {
@@ -309,6 +313,7 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 	NSOpenPanel *openDialog = [NSOpenPanel openPanel];
 	[openDialog setCanChooseFiles:true];
 //	[openDialog setAllowedFileTypes:[NSArray arrayWithObjects:@"zip", nil]];
+	[openDialog setMessage:@"Choose archive to extract"];
 	[openDialog setPrompt:@"Extract"];
 	
 	[openDialog beginWithCompletionHandler:^(NSModalResponse result) {
@@ -345,9 +350,11 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 			bool cancelOperation = FALSE;
 			bool askedForPassword = FALSE;
 			
-			// Loop though all entries in archive to calculate the size of them
-			// and check if there is any encrypted one.
 			zip_uint64_t total_zip_size = 0u;
+			NSArray *entryPrefixes;
+			
+			// Loop though all entries in archive to check some things
+			// before extracting
 			for (zip_int64_t idx = 0; idx < entries_num; idx++) {
 				zip_stat_t *stat = malloc(sizeof(zip_stat_t));
 				int res = zip_stat_index(zip, idx, 0, stat);
@@ -356,9 +363,29 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 					continue;
 				}
 				
+				// Append entry size to sum
 				total_zip_size += stat->size;
 				
-				// Also, check if is encrypted
+				// Check if all entries are in a single folder
+				// then use that prefix to extract them all the root output path
+				if (idx == 0) {
+					NSString *entryName = [NSString stringWithUTF8String:stat->name];
+					entryPrefixes = [entryName componentsSeparatedByString:@"/"];
+				}
+				else {
+					NSString *entryName = [NSString stringWithUTF8String:stat->name];
+					NSArray *entryNameParts = [entryName componentsSeparatedByString:@"/"];
+					
+					for (int i = 0; i < entryPrefixes.count; i++) {
+						if (![entryNameParts[i] isEqualToString:entryPrefixes[i]]) {
+							NSRange range = { 0, i };
+							entryPrefixes = [entryPrefixes subarrayWithRange:range];
+							break;
+						}
+					}
+				}
+				
+				// Check if is encrypted
 				if (stat->encryption_method != ZIP_EM_NONE && !askedForPassword) {
 					NSLog(@"Archive is encrypted with mode: %d", stat->encryption_method);
 					
@@ -454,8 +481,14 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 							currOutputPath = outputPath;
 						}
 						else {
-							currOutputPath = [NSString stringWithFormat:@"%@/%@", outputPath,
-											  [NSString stringWithUTF8String:stat->name]];
+							NSString *entryName = [NSString stringWithUTF8String:stat->name];
+							NSArray *entryNameParts = [entryName componentsSeparatedByString:@"/"];
+							
+							NSRange range = { entryPrefixes.count, entryNameParts.count - entryPrefixes.count };
+							entryNameParts = [entryNameParts subarrayWithRange:range];
+							entryName = [entryNameParts componentsJoinedByString:@"/"];
+							
+							currOutputPath = [NSString stringWithFormat:@"%@/%@", outputPath, entryName];
 						}
 						
 						const char *cOutputPath = [currOutputPath UTF8String];
