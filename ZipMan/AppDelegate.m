@@ -44,8 +44,8 @@
 
 - (void)ZipFile:(NSString*)file
 		zipFile:(zip_t*)zip
-	  entryName:(NSString*)entry {
-	
+	  entryName:(NSString*)entry
+{
 	const char *inputPath = [file UTF8String];
 
 	// Open input file
@@ -435,7 +435,9 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 			void (^zipExtractBlock)(void) = ^{
 				NSError *error;
 				zip_uint64_t total_size_read = 0u;
+				
 				bool isCanceled = FALSE;
+				bool errorOccured = FALSE;
 				
 				@try {
 					for (zip_int64_t idx = 0; idx < entries_num; idx++) {
@@ -447,17 +449,18 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 							continue;
 						}
 						
-						bool isFolder = stat->name[strlen(stat->name) - 1] == '/';
 						NSString *currOutputPath;
 						if (entries_num == 1) {
 							currOutputPath = outputPath;
 						}
 						else {
-							currOutputPath = [NSString stringWithFormat:@"%@/%s", outputPath, stat->name];
+							currOutputPath = [NSString stringWithFormat:@"%@/%@", outputPath,
+											  [NSString stringWithUTF8String:stat->name]];
 						}
 						
 						const char *cOutputPath = [currOutputPath UTF8String];
 						
+						bool isFolder = stat->name[strlen(stat->name) - 1] == '/';
 						if (isFolder) {
 							// If entry is folder then just create a folder
 							bool okMkdir = [[NSFileManager defaultManager] createDirectoryAtPath:currOutputPath withIntermediateDirectories:YES attributes:nil error:&error];
@@ -471,22 +474,28 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 						else {
 							// Create all parent folders
 							NSString *outputParentFolders = [currOutputPath stringByDeletingLastPathComponent];
-							bool okMkdir = [[NSFileManager defaultManager] createDirectoryAtPath:outputParentFolders withIntermediateDirectories:YES attributes:nil error:&error];
+							bool okMkdir = [[NSFileManager defaultManager] createDirectoryAtPath:outputParentFolders
+																	 withIntermediateDirectories:YES attributes:nil error:&error];
 							if (!okMkdir) {
-								NSLog(@"Error creating folder at %@: %@", outputPath, error.localizedDescription);
-								[NSException raise:@"Error creating folder at %@" format:@"%@", error.localizedDescription];
+								NSLog(@"Error creating folder at \"%@\": %@", outputPath, error.localizedDescription);
+								[NSException raise:@"Error creating folder at \"%@\"" format:@"%@", error.localizedDescription];
 							}
 							
 							// Open output file
 							FILE *fp = fopen(cOutputPath, "wb");
 							if (fp == NULL) {
-								NSLog(@"Cannot write to file: %s", cOutputPath);
-								continue;
+								const char *error_msg = strerror(errno);
+								NSLog(@"Cannot create file at \"%s\": %s", cOutputPath, error_msg);
+								[NSException raise:
+								   [NSString stringWithFormat:@"Failed creating file \"%s\"", cOutputPath]
+									  		 format:@"%s", error_msg];
 							}
 							
 							// Open file in zip
 							zip_file_t *file = zip_fopen_index(zip, idx, 0);
 							if (file == NULL) {
+								fclose(fp);
+								
 								const char *error_msg = zip_strerror(zip);
 								NSLog(@"Error accessing file %s [%lld]: %s", stat->name, idx, error_msg);
 								[NSException raise:@"Error accessing file in archive" format:@"%s", error_msg];
@@ -525,7 +534,7 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 							// Release resources
 							fclose(fp);
 							zip_fclose(file);
-							
+
 							if (isCanceled)
 								break;
 							
@@ -541,7 +550,7 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 						[alert runModal];
 					});
 					
-					return;
+					errorOccured = TRUE;
 				}
 				@finally{
 					zip_close(zip);
@@ -551,8 +560,9 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 					});
 				}
 				
-				if (isCanceled) {
-					NSLog(@"Cancelling operation...");
+				if (isCanceled || errorOccured) {
+					if (isCanceled)
+						NSLog(@"Cancelling operation...");
 					
 					// Delete output dir
 					bool okRmOutput = [[NSFileManager defaultManager] removeItemAtPath:outputPath error:&error];
