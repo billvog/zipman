@@ -154,7 +154,7 @@
 	[dirs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 		NSString *filename = (NSString *)obj;
 		
-		if ([self.WithoutMacResForksCheckbox state] == NSControlStateValueOn &&
+		if ([self.ExcludeMacResForksCheckbox state] == NSControlStateValueOn &&
 			[filename isEqualToString:@".DS_Store"]) {
 			NSLog(@"Skipping %@ because WithoutMacResForksCheckbox is checked", filename);
 			return;
@@ -270,8 +270,9 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 			// Show progress window
 			self.progressController = [[ProgressController alloc] initWithWindowNibName:@"Progress"];
 			[self.progressController showWindow:self];
-			[[self.progressController window] setTitle:[NSString stringWithFormat:@"Zipping \"%@\"", zipOutputPath]];
-
+			[[self.progressController window] setTitle:@"In Progress..."];
+			[self.progressController setTaskDescription:[NSString stringWithFormat:@"Zipping \"%@\"", zipOutputPath]];
+			
 			// Register for progress callback
 			zip_register_progress_callback_with_state(zip, 0.0, onZipCloseProgress, nil, (__bridge void *)(self));
 
@@ -498,6 +499,10 @@ int onZipCloseCancel(zip_t *zip, void *ud) {
 							
 							currOutputPath = [NSString stringWithFormat:@"%@/%@", outputPath, entryName];
 						}
+						
+						dispatch_sync(dispatch_get_main_queue(), ^{
+							[self.progressController setTaskDescription:[NSString stringWithFormat:@"Extracting \"%@\"...", currOutputPath]];
+						});
 						
 						const char *cOutputPath = [currOutputPath UTF8String];
 						

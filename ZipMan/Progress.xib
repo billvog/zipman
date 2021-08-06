@@ -7,9 +7,9 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ProgressController">
             <connections>
-                <outlet property="CancelBtn" destination="4dC-sb-jmc" id="vCM-9F-d6O"/>
+                <outlet property="CancelBtn" destination="LYd-BH-ncc" id="VoW-Mv-oSr"/>
                 <outlet property="ProgressIndicator" destination="fZ7-y4-jHQ" id="oLR-Hd-RFQ"/>
-                <outlet property="ProgressText" destination="dI8-F8-MkR" id="7Gy-cb-ULp"/>
+                <outlet property="TaskDescriptionText" destination="Ikd-OY-R0U" id="sUB-IV-hsx"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="rnC-R8-Ebc"/>
             </connections>
         </customObject>
@@ -17,42 +17,45 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="In Progress..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
-            <rect key="contentRect" x="196" y="240" width="459" height="98"/>
+            <rect key="contentRect" x="196" y="240" width="459" height="67"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1080"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="459" height="98"/>
+                <rect key="frame" x="0.0" y="0.0" width="459" height="67"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <progressIndicator fixedFrame="YES" maxValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="fZ7-y4-jHQ" userLabel="ProgressIndicator">
-                        <rect key="frame" x="20" y="59" width="367" height="20"/>
+                        <rect key="frame" x="20" y="17" width="385" height="20"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     </progressIndicator>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dI8-F8-MkR" userLabel="ProgressText">
-                        <rect key="frame" x="393" y="61" width="48" height="16"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="0%" id="fqT-ca-aZ2">
-                            <font key="font" usesAppearanceFont="YES"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LYd-BH-ncc" userLabel="Cancel">
+                        <rect key="frame" x="423" y="17" width="16" height="20"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="xmark.circle.fill" catalog="system" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="i8h-7s-tVZ">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="CancelClicked:" target="-2" id="ko0-rT-ZmF"/>
+                        </connections>
+                    </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ikd-OY-R0U" userLabel="TaskDescritpion">
+                        <rect key="frame" x="18" y="42" width="423" height="16"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="left" title="In Progress..." id="k0h-Dj-8BP">
+                            <font key="font" metaFont="systemMedium" size="12"/>
+                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4dC-sb-jmc">
-                        <rect key="frame" x="371" y="13" width="75" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rI8-Wy-rTM">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                            <string key="keyEquivalent" base64-UTF8="YES">
-Gw
-</string>
-                        </buttonCell>
-                        <connections>
-                            <action selector="CancelClicked:" target="-2" id="Ofn-Wb-IPe"/>
-                        </connections>
-                    </button>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="129.5" y="99"/>
+            <connections>
+                <outlet property="delegate" destination="-2" id="Gk8-Ci-AWO"/>
+            </connections>
+            <point key="canvasLocation" x="124.5" y="85.5"/>
         </window>
     </objects>
+    <resources>
+        <image name="xmark.circle.fill" catalog="system" width="15" height="15"/>
+    </resources>
 </document>

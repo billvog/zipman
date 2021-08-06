@@ -9,16 +9,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ProgressController: NSWindowController
+@interface ProgressController: NSWindowController<NSWindowDelegate>
 
 @property (readonly) NSDate *lastUpdatedProgress;
 @property (readonly) BOOL isCanceled;
 
+@property (strong) IBOutlet NSTextField *TaskDescriptionText;
 @property (strong) IBOutlet NSProgressIndicator *ProgressIndicator;
-@property (strong) IBOutlet NSTextField *ProgressText;
 @property (strong) IBOutlet NSButton *CancelBtn;
 
+- (void)setTaskDescription:(NSString *)TaskDescription;
 - (void)UpdateProgress:(float) progress;
+- (void)DoCancel;
 
 - (IBAction)CancelClicked:(id)sender;
 

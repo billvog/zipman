@@ -1,2 +1,5 @@
 # Misc
 .DS_Store
+
+# Xcode userdata
+ZipMan.xcodeproj/project.xcworkspace/xcuserdata

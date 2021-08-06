@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		71171D4B26BAE2EA0078F9EE /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 71171D4A26BAE2EA0078F9EE /* Credits.rtf */; };
+		714666B326BD6F340017DAAB /* ZipMan.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 714666B226BD6F340017DAAB /* ZipMan.iconset */; };
 		7149599B26B9AC6300892725 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7149599A26B9AC6300892725 /* AppDelegate.m */; };
 		7149599D26B9AC6700892725 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7149599C26B9AC6700892725 /* Assets.xcassets */; };
 		714959A026B9AC6700892725 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7149599E26B9AC6700892725 /* MainMenu.xib */; };
@@ -22,6 +23,7 @@
 
 /* Begin PBXFileReference section */
 		71171D4A26BAE2EA0078F9EE /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
+		714666B226BD6F340017DAAB /* ZipMan.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = ZipMan.iconset; sourceTree = "<group>"; };
 		7149599626B9AC6300892725 /* ZipMan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZipMan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7149599926B9AC6300892725 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		7149599A26B9AC6300892725 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 		715D6FD326BC5A5A00BBC940 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				714666B226BD6F340017DAAB /* ZipMan.iconset */,
 				715D6FD426BC5BDA00BBC940 /* encryption_disabled.mp3 */,
 				715D6FD126BC5A3600BBC940 /* encryption_enabled.mp3 */,
 				71171D4A26BAE2EA0078F9EE /* Credits.rtf */,
@@ -154,6 +157,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				714666B326BD6F340017DAAB /* ZipMan.iconset in Resources */,
 				715D6FD526BC5BDA00BBC940 /* encryption_disabled.mp3 in Resources */,
 				715D6FD226BC5A3600BBC940 /* encryption_enabled.mp3 in Resources */,
 				71BF8D6926BBE37100DEEAB4 /* PasswordPrompt.xib in Resources */,

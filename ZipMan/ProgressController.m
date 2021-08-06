@@ -16,23 +16,31 @@
     [super windowDidLoad];
 }
 
+- (void)windowWillClose:(NSNotification *)notification {
+	[self DoCancel];
+}
+
+- (void)setTaskDescription:(NSString *)TaskDescription {
+	[self.TaskDescriptionText setStringValue:TaskDescription];
+}
+
 - (void)UpdateProgress:(float) progress {
 	// Limit updates to one per 500ms
-	NSTimeInterval interval = [NSDate.now timeIntervalSinceDate:_lastUpdatedProgress];
+	NSTimeInterval interval = [NSDate.now timeIntervalSinceDate:self.lastUpdatedProgress];
 	if (interval != NAN && interval < 0.5)
 		return;
 	
-	[_ProgressIndicator setDoubleValue:progress];
-	[_ProgressText setStringValue:[NSString stringWithFormat:@"%.1f%%", progress]];
-	
+	[self.ProgressIndicator setDoubleValue:progress];
 	_lastUpdatedProgress = [NSDate now];
-	
-//	NSLog(@"Zip progress: %.1f", progress);
+}
+
+- (void)DoCancel {
+	_isCanceled = TRUE;
+	[self.CancelBtn setEnabled:false];
 }
 
 - (IBAction)CancelClicked:(id)sender {
-	_isCanceled = TRUE;
-	[_CancelBtn setEnabled:false];
+	[self DoCancel];
 }
 
 @end
