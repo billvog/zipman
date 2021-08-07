@@ -35,7 +35,7 @@
 }
 
 - (void)DoCancel {
-	_isCanceled = TRUE;
+	[self.delegate onOperationCanceled];
 	[self.CancelBtn setEnabled:false];
 }
 

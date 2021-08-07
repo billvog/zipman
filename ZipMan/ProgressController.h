@@ -9,7 +9,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol ProgressDelegate <NSObject>
+- (void)onOperationCanceled;
+@end
+
 @interface ProgressController: NSWindowController<NSWindowDelegate>
+@property (nonatomic, weak) id <ProgressDelegate> delegate;
 
 @property (readonly) NSDate *lastUpdatedProgress;
 @property (readonly) BOOL isCanceled;

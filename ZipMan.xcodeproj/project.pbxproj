@@ -15,10 +15,12 @@
 		714959A326B9AC6700892725 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 714959A226B9AC6700892725 /* main.m */; };
 		715D6FD226BC5A3600BBC940 /* encryption_enabled.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 715D6FD126BC5A3600BBC940 /* encryption_enabled.mp3 */; };
 		715D6FD526BC5BDA00BBC940 /* encryption_disabled.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 715D6FD426BC5BDA00BBC940 /* encryption_disabled.mp3 */; };
+		717CE93226BD9DE900D6F319 /* ZipHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CE93126BD9DE900D6F319 /* ZipHandler.m */; };
 		71B5473126BA905000F97107 /* ProgressWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 71B5473026BA905000F97107 /* ProgressWindow.xib */; };
 		71B5473426BA907300F97107 /* ProgressController.m in Sources */ = {isa = PBXBuildFile; fileRef = 71B5473326BA907300F97107 /* ProgressController.m */; };
 		71BF8D6926BBE37100DEEAB4 /* PasswordPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 71BF8D6826BBE37100DEEAB4 /* PasswordPrompt.xib */; };
 		71BF8D6D26BBE38C00DEEAB4 /* PasswordPromptController.m in Sources */ = {isa = PBXBuildFile; fileRef = 71BF8D6B26BBE38C00DEEAB4 /* PasswordPromptController.m */; };
+		71E219F826BED5A400C4ED99 /* BaseArchiveHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E219F726BED5A400C4ED99 /* BaseArchiveHandler.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,12 +36,16 @@
 		714959A426B9AC6700892725 /* ZipMan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZipMan.entitlements; sourceTree = "<group>"; };
 		715D6FD126BC5A3600BBC940 /* encryption_enabled.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = encryption_enabled.mp3; sourceTree = "<group>"; };
 		715D6FD426BC5BDA00BBC940 /* encryption_disabled.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = encryption_disabled.mp3; sourceTree = "<group>"; };
+		717CE93126BD9DE900D6F319 /* ZipHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZipHandler.m; sourceTree = "<group>"; };
+		717CE93326BD9DF800D6F319 /* ZipHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZipHandler.h; sourceTree = "<group>"; };
 		71B5473026BA905000F97107 /* ProgressWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ProgressWindow.xib; sourceTree = "<group>"; };
 		71B5473226BA907300F97107 /* ProgressController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressController.h; sourceTree = "<group>"; };
 		71B5473326BA907300F97107 /* ProgressController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProgressController.m; sourceTree = "<group>"; };
 		71BF8D6826BBE37100DEEAB4 /* PasswordPrompt.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PasswordPrompt.xib; sourceTree = "<group>"; };
 		71BF8D6A26BBE38C00DEEAB4 /* PasswordPromptController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PasswordPromptController.h; sourceTree = "<group>"; };
 		71BF8D6B26BBE38C00DEEAB4 /* PasswordPromptController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordPromptController.m; sourceTree = "<group>"; };
+		71E219F626BED5A400C4ED99 /* BaseArchiveHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BaseArchiveHandler.h; sourceTree = "<group>"; };
+		71E219F726BED5A400C4ED99 /* BaseArchiveHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BaseArchiveHandler.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +92,10 @@
 				71BF8D6826BBE37100DEEAB4 /* PasswordPrompt.xib */,
 				71BF8D6A26BBE38C00DEEAB4 /* PasswordPromptController.h */,
 				71BF8D6B26BBE38C00DEEAB4 /* PasswordPromptController.m */,
+				717CE93126BD9DE900D6F319 /* ZipHandler.m */,
+				717CE93326BD9DF800D6F319 /* ZipHandler.h */,
+				71E219F626BED5A400C4ED99 /* BaseArchiveHandler.h */,
+				71E219F726BED5A400C4ED99 /* BaseArchiveHandler.m */,
 			);
 			path = ZipMan;
 			sourceTree = "<group>";
@@ -175,6 +185,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71E219F826BED5A400C4ED99 /* BaseArchiveHandler.m in Sources */,
+				717CE93226BD9DE900D6F319 /* ZipHandler.m in Sources */,
 				71B5473426BA907300F97107 /* ProgressController.m in Sources */,
 				714959A326B9AC6700892725 /* main.m in Sources */,
 				71BF8D6D26BBE38C00DEEAB4 /* PasswordPromptController.m in Sources */,
