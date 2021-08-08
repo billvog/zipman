@@ -1,6 +1,6 @@
 //
 //  ZipHandler.h
-//  This class handles all the zip operations
+//  This class handles all the Zip operations
 //
 //  Created by  Βασίλης Βογιατζής on 6/8/21.
 //
@@ -12,11 +12,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol ZipHandlerDelegate <NSObject, BaseArchiveHandlerDelegate>
-@end
-
 @interface ZipHandler: BaseArchiveHandler
-@property (nonatomic, weak) id <ZipHandlerDelegate> 	delegate;
+@property (nonatomic, weak) id <BaseArchiveHandlerDelegate> delegate;
 @property (nonatomic, readonly) zip_t*				Zip;
 @property (nonatomic, readonly) int 				ZipErrorCode;
 @property (nonatomic, readonly) zip_int32_t 		CompressionLevel;

@@ -14,15 +14,14 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
-                <outlet property="CompressionMethodSlider" destination="vd2-pu-y9F" id="EYk-TN-LAC"/>
-                <outlet property="CompressionMethodText" destination="lNL-os-e8F" id="58q-Ch-wyh"/>
-                <outlet property="DelAfterCompCheckbox" destination="o9L-pH-nWa" id="Y1l-Nj-3aC"/>
-                <outlet property="EncryptionAlgorithmPopup" destination="p51-nJ-TTh" id="Ftq-jO-SU6"/>
-                <outlet property="EncryptionPasswordField" destination="c7Z-Yj-Tbk" id="PqR-5y-5L8"/>
-                <outlet property="EncryptionPasswordValidLock" destination="YDC-BJ-mgd" id="cdl-xj-Aph"/>
-                <outlet property="EncryptionRepeatField" destination="6qQ-0F-fu0" id="HZz-6H-Bkn"/>
-                <outlet property="EncryptionRepeatValid" destination="EPp-BA-sdo" id="Eqb-2l-t5E"/>
-                <outlet property="ExcludeMacResForksCheckbox" destination="X2B-Hl-FAA" id="hTR-K6-3JM"/>
+                <outlet property="ArchiveFormatSelector" destination="Jyj-wz-1H0" id="5m1-uL-aCn"/>
+                <outlet property="CompressionMethodSlider" destination="x9M-k7-V39" id="TUg-6R-1MC"/>
+                <outlet property="CompressionMethodText" destination="ZsZ-xq-jHv" id="5Za-3p-9p0"/>
+                <outlet property="EncryptionAlgorithmPopup" destination="maA-qi-GJE" id="TqE-u5-l8y"/>
+                <outlet property="EncryptionPasswordField" destination="4CW-MU-Qq7" id="3g0-Hp-MgR"/>
+                <outlet property="EncryptionPasswordValidLock" destination="Dsz-2D-yk2" id="YfA-Xg-t5g"/>
+                <outlet property="EncryptionRepeatField" destination="uho-2z-L6P" id="vTB-VN-IsJ"/>
+                <outlet property="EncryptionRepeatValid" destination="MvW-ts-RsJ" id="e3E-UR-aAb"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -131,73 +130,101 @@
             </items>
             <point key="canvasLocation" x="200" y="121"/>
         </menu>
-        <window title="ZipMan" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
+        <window title="ZipMan" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" toolbarStyle="unified" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
-            <rect key="contentRect" x="335" y="390" width="467" height="280"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="900"/>
+            <rect key="contentRect" x="335" y="390" width="487" height="208"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1080"/>
             <view key="contentView" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="467" height="280"/>
+                <rect key="frame" x="0.0" y="0.0" width="487" height="208"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <box boxType="custom" cornerRadius="4" title="Box" transparent="YES" id="VDh-5W-miB">
-                        <rect key="frame" x="0.0" y="-5" width="467" height="285"/>
+                    <box fixedFrame="YES" boxType="custom" cornerRadius="4" title="Box" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="woR-u5-Ch0">
+                        <rect key="frame" x="0.0" y="0.0" width="487" height="208"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <view key="contentView" id="aMq-gZ-8yL">
-                            <rect key="frame" x="17" y="17" width="433" height="251"/>
+                        <view key="contentView" id="Pwc-7R-oKD">
+                            <rect key="frame" x="13" y="13" width="461" height="182"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="lNL-os-e8F" userLabel="CompressionMethodLabel">
-                                    <rect key="frame" x="-2" y="235" width="437" height="16"/>
+                                <box title="Box" titlePosition="noTitle" id="HfS-Cx-loJ" userLabel="ArchiveSpecConf">
+                                    <rect key="frame" x="-3" y="-4" width="467" height="188"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Method: Normal" id="Ucx-dy-Su3">
-                                        <font key="font" usesAppearanceFont="YES"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vd2-pu-y9F" userLabel="CompressionMethodSlider">
-                                    <rect key="frame" x="-2" y="205" width="437" height="28"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                    <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="60" tickMarkPosition="above" numberOfTickMarks="6" allowsTickMarkValuesOnly="YES" sliderType="linear" id="bmj-UW-V0M"/>
-                                    <connections>
-                                        <action selector="CompressionMethodSliderChanged:" target="Voe-Tx-rLC" id="F8H-he-F7N"/>
-                                    </connections>
-                                </slider>
-                                <box fixedFrame="YES" title="Encryption" translatesAutoresizingMaskIntoConstraints="NO" id="QaJ-JW-iTC" userLabel="Encryption Box">
-                                    <rect key="frame" x="-3" y="56" width="439" height="147"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                    <view key="contentView" id="I4W-aM-yOc">
-                                        <rect key="frame" x="3" y="3" width="433" height="129"/>
+                                    <view key="contentView" id="QML-nZ-1q7">
+                                        <rect key="frame" x="19" y="19" width="429" height="150"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
-                                            <gridView xPlacement="fill" yPlacement="center" rowAlignment="none" rowSpacing="12" id="Wlf-TG-fF3">
-                                                <rect key="frame" x="20" y="22" width="393" height="86"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ZsZ-xq-jHv">
+                                                <rect key="frame" x="-2" y="134" width="433" height="16"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="Method: Normal" id="R65-ve-0yS">
+                                                    <font key="font" usesAppearanceFont="YES"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x9M-k7-V39">
+                                                <rect key="frame" x="-2" y="100" width="432" height="28"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="60" tickMarkPosition="above" numberOfTickMarks="6" allowsTickMarkValuesOnly="YES" sliderType="linear" id="8A1-Qg-Yip"/>
+                                                <connections>
+                                                    <action selector="CompressionMethodSliderChanged:" target="Voe-Tx-rLC" id="Zmd-uI-2Wk"/>
+                                                </connections>
+                                            </slider>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Aic-lS-1Tb">
+                                                <rect key="frame" x="-1" y="2" width="123" height="16"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="Encryption Method:" id="xZ1-IL-hIL">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="maA-qi-GJE">
+                                                <rect key="frame" x="125" y="-4" width="306" height="25"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4jl-zL-9T5" id="TNR-N8-cc1">
+                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                    <font key="font" metaFont="menu"/>
+                                                    <menu key="menu" id="igw-hQ-f6f">
+                                                        <items>
+                                                            <menuItem title="Item 1" state="on" id="4jl-zL-9T5"/>
+                                                            <menuItem title="Item 2" id="ZJi-oD-xWt"/>
+                                                            <menuItem title="Item 3" id="wJQ-9Y-IdI"/>
+                                                        </items>
+                                                    </menu>
+                                                </popUpButtonCell>
+                                                <connections>
+                                                    <action selector="EncryptionAlgorithmChanged:" target="Voe-Tx-rLC" id="hHf-sJ-C8K"/>
+                                                </connections>
+                                            </popUpButton>
+                                            <gridView xPlacement="fill" yPlacement="center" rowAlignment="none" columnSpacing="12" id="46h-Wg-Zeb">
+                                                <rect key="frame" x="0.0" y="40" width="429" height="52"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                 <rows>
-                                                    <gridRow id="PBd-we-kis"/>
-                                                    <gridRow id="C8b-n5-Q3A"/>
-                                                    <gridRow id="Fgx-nA-xeL"/>
+                                                    <gridRow id="Phz-nJ-CLS"/>
+                                                    <gridRow id="n4j-1a-MD5"/>
                                                 </rows>
                                                 <columns>
-                                                    <gridColumn width="78" id="HQg-j7-dKx"/>
-                                                    <gridColumn width="284" id="cDy-t5-K8C"/>
-                                                    <gridColumn id="9CF-4e-dC5"/>
+                                                    <gridColumn width="83" id="GpP-Lp-KbP"/>
+                                                    <gridColumn width="297" id="SGN-Fv-koa"/>
+                                                    <gridColumn xPlacement="center" width="25" id="Se4-F3-7Ca"/>
                                                 </columns>
                                                 <gridCells>
-                                                    <gridCell row="PBd-we-kis" column="HQg-j7-dKx" id="9VR-WL-HKm">
-                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Xs-oi-Wf1">
-                                                            <rect key="frame" x="-2" y="70" width="82" height="16"/>
-                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Password:" id="vtn-rA-cdu">
+                                                    <gridCell row="Phz-nJ-CLS" column="GpP-Lp-KbP" id="S06-yq-yad">
+                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" id="yPj-2e-Zy2">
+                                                            <rect key="frame" x="-2" y="36" width="87" height="16"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Password:" id="95R-No-Tjx">
                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                     </gridCell>
-                                                    <gridCell row="PBd-we-kis" column="cDy-t5-K8C" id="faQ-9d-3xY">
-                                                        <secureTextField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="c7Z-Yj-Tbk">
-                                                            <rect key="frame" x="84" y="70" width="284" height="16"/>
-                                                            <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="OlM-ly-ivc">
+                                                    <gridCell row="Phz-nJ-CLS" column="SGN-Fv-koa" id="ObQ-pm-8ZM">
+                                                        <secureTextField key="contentView" verticalHuggingPriority="750" ambiguous="YES" id="4CW-MU-Qq7">
+                                                            <rect key="frame" x="95" y="36" width="297" height="16"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                            <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="B9D-zI-sK1">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -207,26 +234,29 @@
                                                             </secureTextFieldCell>
                                                         </secureTextField>
                                                     </gridCell>
-                                                    <gridCell row="PBd-we-kis" column="9CF-4e-dC5" id="58N-uR-uAE">
-                                                        <imageView key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="YDC-BJ-mgd">
-                                                            <rect key="frame" x="374" y="71.5" width="19.5" height="15"/>
-                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lock.open" catalog="system" id="xEa-Ne-Puf"/>
+                                                    <gridCell row="Phz-nJ-CLS" column="Se4-F3-7Ca" id="oq3-sq-bgY">
+                                                        <imageView key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" id="Dsz-2D-yk2">
+                                                            <rect key="frame" x="408" y="37.5" width="17.5" height="15"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lock.open" catalog="system" id="euv-j4-CLB"/>
                                                         </imageView>
                                                     </gridCell>
-                                                    <gridCell row="C8b-n5-Q3A" column="HQg-j7-dKx" id="O2R-2V-lVd">
-                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Mb-7G-8iR">
-                                                            <rect key="frame" x="-2" y="37" width="82" height="16"/>
-                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Repeat:" id="ucN-sK-xmR">
+                                                    <gridCell row="n4j-1a-MD5" column="GpP-Lp-KbP" id="HQF-81-Zbk">
+                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" id="7oC-yZ-EUU">
+                                                            <rect key="frame" x="-2" y="7" width="87" height="16"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Repeat:" id="rTh-8I-cMd">
                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                     </gridCell>
-                                                    <gridCell row="C8b-n5-Q3A" column="cDy-t5-K8C" rowAlignment="lastBaseline" id="bQa-Xh-B5N">
-                                                        <secureTextField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6qQ-0F-fu0">
-                                                            <rect key="frame" x="84" y="35" width="284" height="21"/>
-                                                            <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="eOK-5T-X2N">
+                                                    <gridCell row="n4j-1a-MD5" column="SGN-Fv-koa" id="utm-Cc-4bR">
+                                                        <secureTextField key="contentView" verticalHuggingPriority="750" ambiguous="YES" id="uho-2z-L6P">
+                                                            <rect key="frame" x="95" y="5" width="297" height="21"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                            <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="HhR-kI-6DH">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -236,77 +266,54 @@
                                                             </secureTextFieldCell>
                                                         </secureTextField>
                                                     </gridCell>
-                                                    <gridCell row="C8b-n5-Q3A" column="9CF-4e-dC5" id="N2u-aU-ZXB">
-                                                        <imageView key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="EPp-BA-sdo">
-                                                            <rect key="frame" x="374" y="32" width="19" height="26"/>
-                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="9CT-lE-ala"/>
-                                                            <color key="contentTintColor" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
+                                                    <gridCell row="n4j-1a-MD5" column="Se4-F3-7Ca" id="6Os-WG-6u0">
+                                                        <imageView key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" id="MvW-ts-RsJ">
+                                                            <rect key="frame" x="404" y="0.0" width="25" height="30"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="Kva-x6-ZLk"/>
                                                         </imageView>
                                                     </gridCell>
-                                                    <gridCell row="Fgx-nA-xeL" column="HQg-j7-dKx" id="LcP-k6-ohg">
-                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Yo-Ue-XPd">
-                                                            <rect key="frame" x="-2" y="2" width="82" height="16"/>
-                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Algorithm:" id="4ER-TJ-Q0A">
-                                                                <font key="font" usesAppearanceFont="YES"/>
-                                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                            </textFieldCell>
-                                                        </textField>
-                                                    </gridCell>
-                                                    <gridCell row="Fgx-nA-xeL" column="cDy-t5-K8C" id="CSe-E7-G3W">
-                                                        <popUpButton key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p51-nJ-TTh" userLabel="EncryptionMethodPopup">
-                                                            <rect key="frame" x="81" y="-4" width="291" height="25"/>
-                                                            <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="JPQ-1Z-V6h" id="E4m-qd-vHE">
-                                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                <font key="font" metaFont="menu"/>
-                                                                <menu key="menu" id="MKJ-nM-nEK">
-                                                                    <items>
-                                                                        <menuItem title="Item 1" state="on" id="JPQ-1Z-V6h"/>
-                                                                        <menuItem title="Item 2" id="UII-fl-eka"/>
-                                                                        <menuItem title="Item 3" id="z8k-ul-2wN"/>
-                                                                    </items>
-                                                                </menu>
-                                                            </popUpButtonCell>
-                                                            <connections>
-                                                                <action selector="EncryptionAlgorithmChanged:" target="Voe-Tx-rLC" id="qkJ-Vz-kFD"/>
-                                                            </connections>
-                                                        </popUpButton>
-                                                    </gridCell>
-                                                    <gridCell row="Fgx-nA-xeL" column="9CF-4e-dC5" id="Asu-kS-OSo"/>
                                                 </gridCells>
                                             </gridView>
                                         </subviews>
                                     </view>
+                                    <size key="contentViewMargins" width="16" height="16"/>
                                 </box>
-                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="X2B-Hl-FAA" userLabel="ExcludeMacResForks">
-                                    <rect key="frame" x="-2" y="24" width="320" height="20"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Exclude Mac Resource forks (eg: .DS_Store) files" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="kuP-rc-ucv">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="ExcludeMacResForksCheckboxChanged:" target="Voe-Tx-rLC" id="h6I-VN-2bL"/>
-                                    </connections>
-                                </button>
-                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o9L-pH-nWa" userLabel="DeleteFilesAfterCompression">
-                                    <rect key="frame" x="-2" y="2" width="189" height="20"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Delete files after compress" bezelStyle="regularSquare" imagePosition="left" inset="2" id="CeI-ds-m8B">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="DelAfterCompCheckboxChanged:" target="Voe-Tx-rLC" id="0fj-xc-scE"/>
-                                    </connections>
-                                </button>
                             </subviews>
                         </view>
-                        <size key="contentViewMargins" width="16" height="16"/>
+                        <size key="contentViewMargins" width="12" height="12"/>
                     </box>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="200.5" y="403"/>
+            <toolbar key="toolbar" implicitIdentifier="234AB31A-A0B3-4819-A463-127931EC0B12" autosavesConfiguration="NO" showsBaselineSeparator="NO" displayMode="iconOnly" sizeMode="regular" id="AsZ-F0-6C8">
+                <allowedToolbarItems>
+                    <toolbarItem implicitItemIdentifier="260EE541-717F-4E30-8159-776279A1B4BA" label="Archive Format" paletteLabel="Archive Format" bordered="YES" title="Item 1" sizingBehavior="auto" id="vec-c7-ajv" userLabel="ArchiveFormatSelector">
+                        <nil key="toolTip"/>
+                        <popUpButton key="view" verticalHuggingPriority="750" id="Jyj-wz-1H0" userLabel="ArchiveFormatSelector">
+                            <rect key="frame" x="7" y="14" width="74" height="25"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <popUpButtonCell key="cell" type="roundTextured" title="Item 1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="KQb-1X-ZNq" id="ZNQ-Ug-KIi">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="menu"/>
+                                <menu key="menu" id="NSf-WD-Orr">
+                                    <items>
+                                        <menuItem title="Item 1" state="on" id="KQb-1X-ZNq"/>
+                                        <menuItem title="Item 2" id="cLh-2H-zZe"/>
+                                        <menuItem title="Item 3" id="aKD-eW-jwK"/>
+                                    </items>
+                                </menu>
+                            </popUpButtonCell>
+                            <connections>
+                                <action selector="ArchiveFormatChanged:" target="Voe-Tx-rLC" id="5k1-oL-Bwy"/>
+                            </connections>
+                        </popUpButton>
+                    </toolbarItem>
+                </allowedToolbarItems>
+                <defaultToolbarItems>
+                    <toolbarItem reference="vec-c7-ajv"/>
+                </defaultToolbarItems>
+            </toolbar>
+            <point key="canvasLocation" x="155.5" y="367"/>
         </window>
     </objects>
     <resources>

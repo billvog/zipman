@@ -32,6 +32,13 @@
 	self.EncryptionPasswordField.delegate = self;
 	self.EncryptionRepeatField.delegate = self;
 	
+	// Setup toolbar
+	self.archiveFormats = [[NSArray alloc] initWithObjects:@"ZIP", @"TAR", nil];
+	self.ArchiveFormatIdx = ZIP_IDX;
+	
+	[self.ArchiveFormatSelector removeAllItems];
+	[self.ArchiveFormatSelector addItemsWithTitles:self.archiveFormats];
+	
 	// Load preferences
 	[self LoadPrefs];
 }
@@ -84,11 +91,26 @@
 		NSURL *fileUrl = [NSURL fileURLWithPath:fullPath];
 		
 		if ([fileUrl hasDirectoryPath]) {
-			[self.zipHandler AddDir:entryName];
+			switch (self.ArchiveFormatIdx) {
+				case ZIP_IDX:
+					[self.zipHandler AddDir:entryName];
+					break;
+				case TAR_IDX:
+					[self.tarHandler AddDir:fullPath entryName:entryName];
+					break;
+			}
+			
 			[self WalkDirToArchive:fullPath baseEntryName:entryName];
 		}
 		else {
-			[self.zipHandler AddFile:fullPath entryName:entryName];
+			switch (self.ArchiveFormatIdx) {
+				case ZIP_IDX:
+					[self.zipHandler AddFile:fullPath entryName:entryName];
+					break;
+				case TAR_IDX:
+					[self.tarHandler AddFile:fullPath entryName:entryName];
+					break;
+			}
 		}
 	}];
 }
@@ -185,6 +207,11 @@
 	}
 }
 
+- (void)SetupTarHandler {
+	self.tarHandler = [[TarHandler alloc] init];
+	self.tarHandler.delegate = self;
+}
+
 // Menubar actions
 - (IBAction)FileMenuCreateArchiveClicked:(id)sender {
 	NSOpenPanel *openDialog = [NSOpenPanel openPanel];
@@ -204,8 +231,19 @@
 		NSURL *selectedUrl = openDialog.URL;
 		NSString *inputPath = [selectedUrl path];
 		
-		// Figure the extension of the archive
-		NSString *archiveExtension = @".zip";
+		// Figure the extension of the new archive
+		NSString *archiveExtension;
+		switch (self.ArchiveFormatIdx) {
+			case ZIP_IDX:
+				archiveExtension = @"zip";
+				break;
+			case TAR_IDX:
+				archiveExtension = @"tar";
+				break;
+			default:
+				archiveExtension = @"zip";
+				break;
+		}
 		
 		// Be sure to create a zip file that doesn't already exists
 		int archiveOutputPathSuffixCount = 2;
@@ -240,75 +278,100 @@
 				}
 			}
 
-			// Setup Zip Handler
-			[self SetupZipHandler];
-			
-			// Create & Open zip
-			bool ok = [self.zipHandler OpenZip:archiveOutputPath readOnly:FALSE];
-			if (!ok) {
-				NSString *error = [self.zipHandler GetError];
-				NSLog(@"Error opening zip: %@", error);
-				[NSException raise:@"Error opening zip" format:@"%@", error];
-			}
-			
-			// Add directory
-			if (selectedUrl.hasDirectoryPath) {
-				[self WalkDirToArchive:inputPath baseEntryName:[selectedUrl lastPathComponent]];
-			}
-			// Add file
-			else {
-				[self.zipHandler AddFile:inputPath entryName:[selectedUrl lastPathComponent]];
-			}
+			if (self.ArchiveFormatIdx == ZIP_IDX) {
+				[self SetupZipHandler];
+				
+				// Create & Open zip
+				bool ok = [self.zipHandler OpenZip:archiveOutputPath readOnly:FALSE];
+				if (!ok) {
+					NSString *error = [self.zipHandler GetError];
+					NSLog(@"Error opening zip: %@", error);
+					[NSException raise:@"Error opening zip" format:@"%@", error];
+				}
+				
+				// Add directory
+				if (selectedUrl.hasDirectoryPath) {
+					[self WalkDirToArchive:inputPath baseEntryName:[selectedUrl lastPathComponent]];
+				}
+				// Add file
+				else {
+					[self.zipHandler AddFile:inputPath entryName:[selectedUrl lastPathComponent]];
+				}
 
-			// Show progress window
-			[self OpenProgressWindow:@"In Progress..."
-					 taskDescription:[NSString stringWithFormat:@"Archiving \"%@\"", archiveOutputPath]];
-			
-			// Close & save archive (in seperate thread)
-			void (^CloseSaveBlock)(void) = ^{
-				bool ok = [self.zipHandler CloseZip];
+				// Show progress window
+				[self OpenProgressWindow:@"In Progress..."
+						 taskDescription:[NSString stringWithFormat:@"Archiving \"%@\"", archiveOutputPath]];
+				
+				// Close & save archive (in seperate thread)
+				void (^CloseSaveBlock)(void) = ^{
+					bool ok = [self.zipHandler CloseZip];
 
-				// Close dialog
-				dispatch_sync(dispatch_get_main_queue(), ^{
-					[self.progressController close];
+					// Close dialog
+					dispatch_sync(dispatch_get_main_queue(), ^{
+						[self.progressController close];
 
-					NSAlert *alert = [[NSAlert alloc] init];
+						NSAlert *alert = [[NSAlert alloc] init];
 
-					// Check for errors
-					if (!ok) {
-						NSString *error = [self.zipHandler GetError];
-						NSLog(@"Error closing archive: %@", error);
+						// Check for errors
+						if (!ok) {
+							NSString *error = [self.zipHandler GetError];
+							NSLog(@"Error closing archive: %@", error);
 
-						[alert setAlertStyle:NSAlertStyleCritical];
-						[alert setMessageText:@"Error closing zip"];
-						[alert setInformativeText:error];
-					}
-					else {
-						bool isSuccess = true;
-						if (self.DelAfterCompCheckbox.state == NSControlStateValueOn) {
-							NSLog(@"Deleting input files because DelAfterCompCheckbox is checked");
+							[alert setAlertStyle:NSAlertStyleCritical];
+							[alert setMessageText:@"Error closing zip"];
+							[alert setInformativeText:error];
+						}
+						else {
+							bool isSuccess = true;
+							if (self.DelAfterCompCheckbox.state == NSControlStateValueOn) {
+								NSLog(@"Deleting input files because DelAfterCompCheckbox is checked");
+								
+								NSError *error;
+								isSuccess = [[NSFileManager defaultManager] removeItemAtPath:inputPath error:&error];
+								if (!isSuccess) {
+									[alert setAlertStyle:NSAlertStyleCritical];
+									[alert setMessageText:@"Error deleting input files"];
+									[alert setInformativeText:error.localizedDescription];
+								}
+							}
 							
-							NSError *error;
-							isSuccess = [[NSFileManager defaultManager] removeItemAtPath:inputPath error:&error];
-							if (!isSuccess) {
-								[alert setAlertStyle:NSAlertStyleCritical];
-								[alert setMessageText:@"Error deleting input files"];
-								[alert setInformativeText:error.localizedDescription];
+							if (isSuccess) {
+								[alert setMessageText:@"Success"];
+								[alert setInformativeText:[NSString stringWithFormat:@"Archive created at \"%@\"", archiveOutputPath]];
 							}
 						}
-						
-						if (isSuccess) {
-							[alert setMessageText:@"Success"];
-							[alert setInformativeText:[NSString stringWithFormat:@"Archive created at \"%@\"", archiveOutputPath]];
-						}
-					}
 
-					[alert runModal];
-				});
-			};
+						[alert runModal];
+					});
+				};
 
-			NSThread *CloseSaveThread = [[NSThread alloc] initWithBlock:CloseSaveBlock];
-			[CloseSaveThread start];
+				NSThread *CloseSaveThread = [[NSThread alloc] initWithBlock:CloseSaveBlock];
+				[CloseSaveThread start];
+			}
+			else if (self.ArchiveFormatIdx == TAR_IDX) {
+				[self SetupTarHandler];
+				
+				// Create & Open tar
+				bool ok = [self.tarHandler OpenTar:archiveOutputPath
+										  readOnly:FALSE
+										   useGzip:FALSE];
+				if (!ok) {
+					NSString *error = [self.tarHandler GetError];
+					NSLog(@"Error opening tar: %@", error);
+					[NSException raise:@"Error opening tar" format:@"%@", error];
+				}
+				
+				// Add directory
+				if (selectedUrl.hasDirectoryPath) {
+					[self WalkDirToArchive:inputPath baseEntryName:[selectedUrl lastPathComponent]];
+				}
+				// Add file
+				else {
+					[self.tarHandler AddFile:inputPath entryName:[selectedUrl lastPathComponent]];
+				}
+				
+				[self.tarHandler CloseTar];
+			}
 		} @catch (NSException *exception) {
 			NSAlert *alert = [[NSAlert alloc] init];
 			[alert setAlertStyle:NSAlertStyleCritical];
@@ -446,10 +509,23 @@
 	}];
 }
 
+- (IBAction)ArchiveFormatChanged:(id)sender {
+	int ArFormatsLength = (int) _archiveFormats.count - 1;
+	int SelectedArFormatIdx = (int) self.ArchiveFormatSelector.indexOfSelectedItem;
+	
+	if (SelectedArFormatIdx > ArFormatsLength) {
+		NSLog(@"SelectedArFormatIdx is greater than the length of supported archive formats: %i", SelectedArFormatIdx);
+		return;
+	}
+	
+	self.ArchiveFormatIdx = SelectedArFormatIdx;
+	NSLog(@"Changed archive format: %i (%@)", SelectedArFormatIdx, self.archiveFormats[SelectedArFormatIdx]);
+}
+
 - (IBAction)CompressionMethodSliderChanged:(id)sender {
-	int CompressionMethodValue = _CompressionMethodSlider.intValue;
-	int CompressionMethodsLength = (int) _compressionMethods.count - 1;
-	int SliderBlock = (int) _CompressionMethodSlider.maxValue / CompressionMethodsLength;
+	int CompressionMethodValue = self.CompressionMethodSlider.intValue;
+	int CompressionMethodsLength = (int) self.compressionMethods.count - 1;
+	int SliderBlock = (int) self.CompressionMethodSlider.maxValue / CompressionMethodsLength;
 	
 	int CompressionMethodIdx = CompressionMethodValue / SliderBlock;
 	if (CompressionMethodIdx > CompressionMethodsLength) {
@@ -457,15 +533,15 @@
 		return;
 	}
 	
-	NSString *CompressionMethodText = _compressionMethods[CompressionMethodIdx];
+	NSString *CompressionMethodText = self.compressionMethods[CompressionMethodIdx];
 	
 	NSLog(@"Compression Method Changed: %i (%@)", CompressionMethodIdx, CompressionMethodText);
 	
 	// Update UI
-	_CompressionMethodText.stringValue = [NSString stringWithFormat:@"Method: %@", CompressionMethodText];
+	self.CompressionMethodText.stringValue = [NSString stringWithFormat:@"Method: %@", CompressionMethodText];
 	
 	// Update variable
-	_CompressionMethodIdx = CompressionMethodIdx;
+	self.CompressionMethodIdx = CompressionMethodIdx;
 }
 
 - (void)CheckEncryptionEnabled {
@@ -522,16 +598,16 @@
 }
 
 - (IBAction)EncryptionAlgorithmChanged:(id)sender {
-	int EncAlgorithmsLength = (int) _encryptionAlgorithms.count - 1;
-	int SelectedEncAlgorithmIdx = (int) _EncryptionAlgorithmPopup.indexOfSelectedItem;
+	int EncAlgorithmsLength = (int) self.encryptionAlgorithms.count - 1;
+	int SelectedEncAlgorithmIdx = (int) self.EncryptionAlgorithmPopup.indexOfSelectedItem;
 	
 	if (SelectedEncAlgorithmIdx > EncAlgorithmsLength) {
 		NSLog(@"SelectedEncAlgorithmIdx is greater than the length of available compression algorithms: %i", SelectedEncAlgorithmIdx);
 		return;
 	}
 	
-	NSLog(@"Changed encryption algorithm: %i (%@)", SelectedEncAlgorithmIdx, _encryptionAlgorithms[SelectedEncAlgorithmIdx]);
-	_EncryptionAlgorithmIdx = SelectedEncAlgorithmIdx;
+	NSLog(@"Changed encryption algorithm: %i (%@)", SelectedEncAlgorithmIdx, self.encryptionAlgorithms[SelectedEncAlgorithmIdx]);
+	self.EncryptionAlgorithmIdx = SelectedEncAlgorithmIdx;
 }
 
 - (IBAction)ExcludeMacResForksCheckboxChanged:(id)sender {
