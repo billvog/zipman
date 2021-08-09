@@ -34,7 +34,7 @@
 	
 	// Setup toolbar
 	self.archiveFormats = [[NSArray alloc] initWithObjects:@"ZIP", @"TAR", nil];
-	self.ArchiveFormatIdx = ZIP_IDX;
+	self.archiveFormatExtensions = [[NSArray alloc] initWithObjects:@"zip", @"tar", nil];
 	
 	[self.ArchiveFormatSelector removeAllItems];
 	[self.ArchiveFormatSelector addItemsWithTitles:self.archiveFormats];
@@ -52,11 +52,12 @@
 - (void)LoadPrefs {
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	
-	// Get prefs
+	_ArchiveFormatIdx = (int) [userDefaults integerForKey:ArchiveFormatPrefKey];
 	BOOL ExcludeMacResForks = [userDefaults boolForKey:ExcludeMacResForksPrefKey];
 	BOOL DelFilesAfterComp = [userDefaults boolForKey:DelFilesAfterCompPrefKey];
 	
 	// Apply them to the UI
+	[self ArchiveFormatHandleChange];
 	[self.ExcludeMacResForksCheckbox setState:ExcludeMacResForks ? NSControlStateValueOn : NSControlStateValueOff];
 	[self.DelAfterCompCheckbox setState:DelFilesAfterComp ? NSControlStateValueOn : NSControlStateValueOff];
 }
@@ -66,11 +67,12 @@
 	self.progressController.delegate = self;
 	[self.progressController showWindow:self];
 	[[self.progressController window] setTitle:title];
-	[self.progressController setTaskDescription:task];
+	[self.progressController SetTaskDescription:task];
 }
 
 - (void)onOperationCanceled {
-	[self.zipHandler CancelOperation];
+	if (self.archiveHandler != nil)
+		[self.archiveHandler CancelOperation];
 }
 
 - (void)WalkDirToArchive:(NSString*)path
@@ -91,26 +93,11 @@
 		NSURL *fileUrl = [NSURL fileURLWithPath:fullPath];
 		
 		if ([fileUrl hasDirectoryPath]) {
-			switch (self.ArchiveFormatIdx) {
-				case ZIP_IDX:
-					[self.zipHandler AddDir:entryName];
-					break;
-				case TAR_IDX:
-					[self.tarHandler AddDir:fullPath entryName:entryName];
-					break;
-			}
-			
+			[self.archiveHandler AddDir:entryName];
 			[self WalkDirToArchive:fullPath baseEntryName:entryName];
 		}
 		else {
-			switch (self.ArchiveFormatIdx) {
-				case ZIP_IDX:
-					[self.zipHandler AddFile:fullPath entryName:entryName];
-					break;
-				case TAR_IDX:
-					[self.tarHandler AddFile:fullPath entryName:entryName];
-					break;
-			}
+			[self.archiveHandler AddFile:fullPath entryName:entryName];
 		}
 	}];
 }
@@ -149,17 +136,27 @@
 
 - (void)onArchiveTaskChanged:(nonnull NSString *)task {
 	if (self.progressController != nil) {
-		[self.progressController setTaskDescription:task];
+		[self.progressController SetTaskDescription:task];
+	}
+}
+
+- (void)SetupSelectedArchiveHandler {
+	switch (self.ArchiveFormatIdx) {
+		case ZIP_IDX:
+			[self SetupZipHandler];
+			break;
+		default:
+			[NSException raise:@"Unsupported archive format" format:@"The selected archive format is not supported"];
 	}
 }
 
 - (void)SetupZipHandler {
 	// Load handler
-	self.zipHandler = [[ZipHandler alloc] init];
-	self.zipHandler.delegate = self;
+	self.archiveHandler = [[ZipHandler alloc] init];
+	self.archiveHandler.delegate = self;
 	
 	// Encryption Method
-	zip_uint16_t EncryptionMethod;
+	uint16_t EncryptionMethod;
 	switch (_EncryptionAlgorithmIdx) {
 		case 0:
 			EncryptionMethod = ZIP_EM_AES_128;
@@ -176,7 +173,7 @@
 	}
 	
 	// Compression Level
-	zip_int32_t CompressionLevel;
+	int32_t CompressionLevel;
 	switch (_CompressionMethodIdx) {
 		case 1:
 			CompressionLevel = 1;
@@ -199,69 +196,40 @@
 	}
 	
 	// Configure
-	[self.zipHandler SetCompressionLevel:CompressionLevel];
-	[self.zipHandler SetEncryptionAlgorithm:EncryptionMethod];
-	[self.zipHandler EnableEncryption:self.isEncryptionEnabled];
+	[self.archiveHandler SetCompressionLevel:CompressionLevel];
+	[self.archiveHandler SetEncryptionAlgorithm:EncryptionMethod];
+	[self.archiveHandler EnableEncryption:self.isEncryptionEnabled];
 	if (self.isEncryptionEnabled) {
-		[self.zipHandler setDefaultPassword:[self.EncryptionPasswordField stringValue]];
+		[self.archiveHandler SetDefaultPassword:[self.EncryptionPasswordField stringValue]];
 	}
 }
 
-- (void)SetupTarHandler {
-	self.tarHandler = [[TarHandler alloc] init];
-	self.tarHandler.delegate = self;
-}
-
-// Menubar actions
-- (IBAction)FileMenuCreateArchiveClicked:(id)sender {
-	NSOpenPanel *openDialog = [NSOpenPanel openPanel];
-	[openDialog setCanChooseFiles:true];
-	[openDialog setCanChooseDirectories:true];
-	[openDialog setMessage:@"Choose files or folders to archive"];
-	[openDialog setPrompt:@"Archive"];
+- (void)CreateArchive:(NSURL*)inputURL {
+	NSString *inputPath = [inputURL path];
 	
-//	TODO
-//	[openDialog setAllowsMultipleSelection:TRUE];
+	// Figure the extension of the new archive
+	NSString *archiveExtension = self.archiveFormatExtensions[self.ArchiveFormatIdx];
 	
-	[openDialog beginWithCompletionHandler:^(NSModalResponse result) {
-		if (result != NSModalResponseOK) {
-			return;
-		}
+	// Be sure to create a file that doesn't already exists
+	int archiveOutputPathSuffixCount = 2;
+	NSURL *archiveOutputUrl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@.%@",
+													  inputPath, archiveExtension]];
+	
+	while ([archiveOutputUrl checkResourceIsReachableAndReturnError:nil]) {
+		archiveOutputUrl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@ %d.%@",
+												   inputPath, archiveOutputPathSuffixCount++,
+												   archiveExtension]];
+	}
+	
+	NSString *archiveOutputPath = [archiveOutputUrl path];
+	
+	@try {
+		// Setup the right archive hanlder
+		[self SetupSelectedArchiveHandler];
 		
-		NSURL *selectedUrl = openDialog.URL;
-		NSString *inputPath = [selectedUrl path];
-		
-		// Figure the extension of the new archive
-		NSString *archiveExtension;
-		switch (self.ArchiveFormatIdx) {
-			case ZIP_IDX:
-				archiveExtension = @"zip";
-				break;
-			case TAR_IDX:
-				archiveExtension = @"tar";
-				break;
-			default:
-				archiveExtension = @"zip";
-				break;
-		}
-		
-		// Be sure to create a zip file that doesn't already exists
-		int archiveOutputPathSuffixCount = 2;
-		NSURL *archiveOutputUrl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@.%@",
-														  [selectedUrl path], archiveExtension]];
-		
-		while ([archiveOutputUrl checkResourceIsReachableAndReturnError:nil]) {
-			archiveOutputUrl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@ %d.%@",
-													   [selectedUrl path], archiveOutputPathSuffixCount++,
-													   archiveExtension]];
-		}
-		
-		NSString *archiveOutputPath = [archiveOutputUrl path];
-		
-		@try {
+		if (self.archiveHandler.SupportsEncryption) {
 			NSString *Password = [self.EncryptionPasswordField stringValue];
 			NSString *RepeatedPassword = [self.EncryptionRepeatField stringValue];
-
 			if (Password.length > 0) {
 				if (![Password isEqualToString:RepeatedPassword]) {
 					NSAlert *alert = [[NSAlert alloc] init];
@@ -277,109 +245,214 @@
 					}
 				}
 			}
+		}
 
-			if (self.ArchiveFormatIdx == ZIP_IDX) {
-				[self SetupZipHandler];
-				
-				// Create & Open zip
-				bool ok = [self.zipHandler OpenZip:archiveOutputPath readOnly:FALSE];
-				if (!ok) {
-					NSString *error = [self.zipHandler GetError];
-					NSLog(@"Error opening zip: %@", error);
-					[NSException raise:@"Error opening zip" format:@"%@", error];
+		// Create & Open archive
+		bool ok = [self.archiveHandler OpenArchive:archiveOutputPath readOnly:FALSE];
+		if (!ok) {
+			NSString *error = [self.archiveHandler GetError];
+			NSLog(@"Error opening archive: %@", error);
+			[NSException raise:@"Error opening archive" format:@"%@", error];
+		}
+
+		// Show progress window
+		[self OpenProgressWindow:@"In Progress..."
+				 taskDescription:[NSString stringWithFormat:@"Archiving \"%@\"", inputPath]];
+		
+		// Add selected in archive (in seperate thread)
+		void (^AddToArchiveBlock)(void) = ^{
+			@try {
+				if (inputURL.hasDirectoryPath) {
+					// Add directory
+					[self WalkDirToArchive:inputPath baseEntryName:[inputURL lastPathComponent]];
 				}
-				
-				// Add directory
-				if (selectedUrl.hasDirectoryPath) {
-					[self WalkDirToArchive:inputPath baseEntryName:[selectedUrl lastPathComponent]];
-				}
-				// Add file
 				else {
-					[self.zipHandler AddFile:inputPath entryName:[selectedUrl lastPathComponent]];
+					// Add file
+					[self.archiveHandler AddFile:inputPath entryName:[inputURL lastPathComponent]];
 				}
 
-				// Show progress window
-				[self OpenProgressWindow:@"In Progress..."
-						 taskDescription:[NSString stringWithFormat:@"Archiving \"%@\"", archiveOutputPath]];
-				
-				// Close & save archive (in seperate thread)
-				void (^CloseSaveBlock)(void) = ^{
-					bool ok = [self.zipHandler CloseZip];
+				bool ok = [self.archiveHandler CloseArchive];
 
-					// Close dialog
-					dispatch_sync(dispatch_get_main_queue(), ^{
-						[self.progressController close];
+				// Close dialog
+				dispatch_sync(dispatch_get_main_queue(), ^{
+					[self.progressController close];
 
-						NSAlert *alert = [[NSAlert alloc] init];
+					// Check for errors
+					if (!ok) {
+						NSString *error = [self.archiveHandler GetError];
+						NSLog(@"Error closing archive: %@", error);
+						[NSException raise:@"Error closing archive" format:@"%@", error];
+					}
+					else {
+						bool ok;
+						if (self.DelAfterCompCheckbox.state == NSControlStateValueOn) {
+							NSLog(@"Deleting input files because DelAfterCompCheckbox is checked");
 
-						// Check for errors
-						if (!ok) {
-							NSString *error = [self.zipHandler GetError];
-							NSLog(@"Error closing archive: %@", error);
-
-							[alert setAlertStyle:NSAlertStyleCritical];
-							[alert setMessageText:@"Error closing zip"];
-							[alert setInformativeText:error];
-						}
-						else {
-							bool isSuccess = true;
-							if (self.DelAfterCompCheckbox.state == NSControlStateValueOn) {
-								NSLog(@"Deleting input files because DelAfterCompCheckbox is checked");
-								
-								NSError *error;
-								isSuccess = [[NSFileManager defaultManager] removeItemAtPath:inputPath error:&error];
-								if (!isSuccess) {
-									[alert setAlertStyle:NSAlertStyleCritical];
-									[alert setMessageText:@"Error deleting input files"];
-									[alert setInformativeText:error.localizedDescription];
-								}
-							}
-							
-							if (isSuccess) {
-								[alert setMessageText:@"Success"];
-								[alert setInformativeText:[NSString stringWithFormat:@"Archive created at \"%@\"", archiveOutputPath]];
+							NSError *error;
+							ok = [[NSFileManager defaultManager] removeItemAtPath:inputPath error:&error];
+							if (!ok) {
+								[NSException raise:@"Error deleting input files"
+											format:@"%@", error.localizedDescription];
 							}
 						}
+					}
 
-						[alert runModal];
-					});
-				};
+					NSAlert *alert = [[NSAlert alloc] init];
+					[alert setMessageText:@"Success"];
+					[alert setInformativeText:[NSString stringWithFormat:@"Archive created at \"%@\"", archiveOutputPath]];
+					[alert runModal];
+				});
+			} @catch (NSException *exception) {
+				dispatch_sync(dispatch_get_main_queue(), ^{
+					NSAlert *alert = [[NSAlert alloc] init];
+					[alert setAlertStyle:NSAlertStyleCritical];
+					[alert setMessageText:exception.name];
+					[alert setInformativeText:exception.reason];
+					[alert runModal];
+				});
+			} @finally {
+				dispatch_sync(dispatch_get_main_queue(), ^{
+					[self.progressController close];
+				});
+			}
+		};
 
-				NSThread *CloseSaveThread = [[NSThread alloc] initWithBlock:CloseSaveBlock];
-				[CloseSaveThread start];
+		NSThread *AddToArchiveThread = [[NSThread alloc] initWithBlock:AddToArchiveBlock];
+		[AddToArchiveThread start];
+	} @catch (NSException *exception) {
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert setAlertStyle:NSAlertStyleCritical];
+		[alert setMessageText:exception.name];
+		[alert setInformativeText:exception.reason];
+		[alert runModal];
+	}
+}
+
+- (void)ExtractArchive:(NSURL*)archiveURL {
+	NSString *archivePath = [archiveURL path];
+	NSString *selectedPathWithoutExt = [[archiveURL path] stringByDeletingPathExtension];
+	
+	NSString *outputPath;
+	NSError* error;
+	
+	@try {
+		// Setup Archive Handler
+		[self SetupSelectedArchiveHandler];
+		
+		// Open archive
+		bool ok = [self.archiveHandler OpenArchive:archivePath readOnly:TRUE];
+		if (!ok) {
+			NSString *error = [self.archiveHandler GetError];
+			NSLog(@"Error opening archive: %@", error);
+			[NSException raise:@"Error opening archive" format:@"%@", error];
+		}
+		
+		ok = [self.archiveHandler Check];
+		if (!ok) {
+			[NSException raise:@"Error checking archive" format:@"An error occured while checking the archive"];
+		}
+		
+		// Choose output path
+		if (self.archiveHandler.NumOfEntries == 1) {
+			outputPath = selectedPathWithoutExt;
+		}
+		else {
+			int outputPathSuffixCount = 2;
+			NSURL *outputUrl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@", selectedPathWithoutExt]];
+			while ([outputUrl checkResourceIsReachableAndReturnError:nil]) {
+				outputUrl = [NSURL fileURLWithPath:
+							 [NSString stringWithFormat:@"%@ %d", selectedPathWithoutExt, outputPathSuffixCount++]];
 			}
-			else if (self.ArchiveFormatIdx == TAR_IDX) {
-				[self SetupTarHandler];
-				
-				// Create & Open tar
-				bool ok = [self.tarHandler OpenTar:archiveOutputPath
-										  readOnly:FALSE
-										   useGzip:FALSE];
-				if (!ok) {
-					NSString *error = [self.tarHandler GetError];
-					NSLog(@"Error opening tar: %@", error);
-					[NSException raise:@"Error opening tar" format:@"%@", error];
-				}
-				
-				// Add directory
-				if (selectedUrl.hasDirectoryPath) {
-					[self WalkDirToArchive:inputPath baseEntryName:[selectedUrl lastPathComponent]];
-				}
-				// Add file
-				else {
-					[self.tarHandler AddFile:inputPath entryName:[selectedUrl lastPathComponent]];
-				}
-				
-				[self.tarHandler CloseTar];
+			
+			outputPath = [outputUrl path];
+			
+			// Create output folder
+			bool okMkdir = [[NSFileManager defaultManager] createDirectoryAtPath:outputPath withIntermediateDirectories:NO attributes:nil error:&error];
+			if (!okMkdir) {
+				NSLog(@"Error creating folder at %@: %@", outputPath, error.localizedDescription);
+				[NSException raise:@"Error creating folder at %@" format:@"%@", error.localizedDescription];
 			}
-		} @catch (NSException *exception) {
+		}
+		
+		// Show progress window
+		[self OpenProgressWindow:[NSString stringWithFormat:@"Extracting \"%@\"", archivePath]
+				 taskDescription:[NSString stringWithFormat:@"Extracting \"%@\"", archivePath]];
+
+		// Extract all entries (in seperate thread)
+		void (^ArchiveExtractBlock)(void) = ^{
+			NSError *error;
+			bool errorOccured = FALSE;
+			
+			@try {
+				[self.archiveHandler ExtractAll:outputPath];
+			} @catch (NSException *exception) {
+				dispatch_sync(dispatch_get_main_queue(), ^{
+					NSAlert *alert = [[NSAlert alloc] init];
+					[alert setAlertStyle:NSAlertStyleCritical];
+					[alert setMessageText:exception.name];
+					[alert setInformativeText:exception.reason];
+					[alert runModal];
+				});
+				
+				errorOccured = TRUE;
+			}
+			@finally{
+				[self.archiveHandler CloseArchive];
+				
+				dispatch_sync(dispatch_get_main_queue(), ^{
+					[self.progressController close];
+				});
+			}
+			
+			if (self.archiveHandler.isOperationCanceled || errorOccured) {
+				if (self.archiveHandler.isOperationCanceled)
+					NSLog(@"Cancelling operation...");
+				
+				// Delete output dir
+				bool okRmOutput = [[NSFileManager defaultManager] removeItemAtPath:outputPath error:&error];
+				if (!okRmOutput) {
+					NSLog(@"Couldn't remove output directory: %@", outputPath);
+				}
+				
+				return;
+			}
+			
+			dispatch_sync(dispatch_get_main_queue(), ^{
+				NSAlert *alert = [[NSAlert alloc] init];
+				[alert setMessageText:@"Success"];
+				[alert setInformativeText:[NSString stringWithFormat:@"Zip extracted at %@", outputPath]];
+				[alert runModal];
+			});
+		};
+		
+		NSThread *ArchiveExtractThread = [[NSThread alloc] initWithBlock:ArchiveExtractBlock];
+		[ArchiveExtractThread start];
+	} @catch (NSException *exception) {
+		if (exception.name.length > 0 && exception.reason.length > 0) {
 			NSAlert *alert = [[NSAlert alloc] init];
 			[alert setAlertStyle:NSAlertStyleCritical];
 			[alert setMessageText:exception.name];
 			[alert setInformativeText:exception.reason];
 			[alert runModal];
+		}
+	}
+}
+
+// Menubar actions
+- (IBAction)FileMenuCreateArchiveClicked:(id)sender {
+	NSOpenPanel *openDialog = [NSOpenPanel openPanel];
+	[openDialog setCanChooseFiles:true];
+	[openDialog setCanChooseDirectories:true];
+	[openDialog setMessage:@"Choose files or folders to archive"];
+	[openDialog setPrompt:@"Archive"];
+	
+	[openDialog beginWithCompletionHandler:^(NSModalResponse result) {
+		if (result != NSModalResponseOK) {
 			return;
 		}
+		
+		NSURL *selectedUrl = openDialog.URL;
+		[self CreateArchive:selectedUrl];
 	}];
 }
 
@@ -396,117 +469,33 @@
 		if (result != NSModalResponseOK)
 			return;
 		
-		NSString *outputPath;
-		
 		NSURL *selectedUrl = openDialog.URL;
-		NSString *selectedPathWithoutExt = [[selectedUrl path] stringByDeletingPathExtension];
-		
-		NSString *archivePath = [selectedUrl path];
-		
-		@try {
-			NSError* error;
-			
-			// Setup Zip Handler
-			[self SetupZipHandler];
-			
-			// Open zip
-			bool ok = [self.zipHandler OpenZip:archivePath readOnly:TRUE];
-			if (!ok) {
-				NSString *error = [self.zipHandler GetError];
-				NSLog(@"Error opening zip: %@", error);
-				[NSException raise:@"Error opening zip" format:@"%@", error];
-			}
-			
-			ok = [self.zipHandler Check];
-			if (!ok) {
-				[NSException raise:@"" format:@""];
-			}
-			
-			// Choose output path
-			if (self.zipHandler.NumOfEntries == 1) {
-				outputPath = selectedPathWithoutExt;
-			}
-			else {
-				int outputPathSuffixCount = 2;
-				NSURL *outputUrl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@", selectedPathWithoutExt]];
-				while ([outputUrl checkResourceIsReachableAndReturnError:nil]) {
-					outputUrl = [NSURL fileURLWithPath:
-								 [NSString stringWithFormat:@"%@ %d", selectedPathWithoutExt, outputPathSuffixCount++]];
-				}
-				
-				outputPath = [outputUrl path];
-				
-				// Create output folder
-				bool okMkdir = [[NSFileManager defaultManager] createDirectoryAtPath:outputPath withIntermediateDirectories:NO attributes:nil error:&error];
-				if (!okMkdir) {
-					NSLog(@"Error creating folder at %@: %@", outputPath, error.localizedDescription);
-					[NSException raise:@"Error creating folder at %@" format:@"%@", error.localizedDescription];
-				}
-			}
-			
-			// Show progress window
-			[self OpenProgressWindow:[NSString stringWithFormat:@"Extracting \"%@\"", archivePath]
-					 taskDescription:[NSString stringWithFormat:@"Extracting \"%@\"", archivePath]];
-
-			// Extract all entries (in seperate thread)
-			void (^ArchiveExtractBlock)(void) = ^{
-				NSError *error;
-				bool errorOccured = FALSE;
-				
-				@try {
-					[self.zipHandler ExtractAll:outputPath];
-				} @catch (NSException *exception) {
-					dispatch_sync(dispatch_get_main_queue(), ^{
-						NSAlert *alert = [[NSAlert alloc] init];
-						[alert setAlertStyle:NSAlertStyleCritical];
-						[alert setMessageText:exception.name];
-						[alert setInformativeText:exception.reason];
-						[alert runModal];
-					});
-					
-					errorOccured = TRUE;
-				}
-				@finally{
-					[self.zipHandler CloseZip];
-					
-					dispatch_sync(dispatch_get_main_queue(), ^{
-						[self.progressController close];
-					});
-				}
-				
-				if (self.zipHandler.isOperationCanceled || errorOccured) {
-					if (self.zipHandler.isOperationCanceled)
-						NSLog(@"Cancelling operation...");
-					
-					// Delete output dir
-					bool okRmOutput = [[NSFileManager defaultManager] removeItemAtPath:outputPath error:&error];
-					if (!okRmOutput) {
-						NSLog(@"Couldn't remove output directory: %@", outputPath);
-					}
-					
-					return;
-				}
-				
-				dispatch_sync(dispatch_get_main_queue(), ^{
-					NSAlert *alert = [[NSAlert alloc] init];
-					[alert setMessageText:@"Success"];
-					[alert setInformativeText:[NSString stringWithFormat:@"Zip extracted at %@", outputPath]];
-					[alert runModal];
-				});
-			};
-			
-			NSThread *ArchiveExtractThread = [[NSThread alloc] initWithBlock:ArchiveExtractBlock];
-			[ArchiveExtractThread start];
-		} @catch (NSException *exception) {
-			if (exception.name.length > 0 && exception.reason.length > 0) {
-				NSAlert *alert = [[NSAlert alloc] init];
-				[alert setAlertStyle:NSAlertStyleCritical];
-				[alert setMessageText:exception.name];
-				[alert setInformativeText:exception.reason];
-				[alert runModal];
-			}
-		}
+		[self ExtractArchive:selectedUrl];
 	}];
+}
+
+- (void)ArchiveFormatHandleChange {
+	int SelectedArFormatIdx = (int) self.ArchiveFormatSelector.indexOfSelectedItem;
+	if (SelectedArFormatIdx != self.ArchiveFormatIdx) {
+		[self.ArchiveFormatSelector selectItemAtIndex:self.ArchiveFormatIdx];
+	}
+	
+	// Update userdefaults
+	[[NSUserDefaults standardUserDefaults] setInteger:self.ArchiveFormatIdx forKey:ArchiveFormatPrefKey];
+	
+	// Update UI
+	if (self.ArchiveFormatIdx == TAR_IDX) {
+		[self.CompressionMethodSlider 	setEnabled:FALSE];
+		[self.EncryptionPasswordField 	setEnabled:FALSE];
+		[self.EncryptionRepeatField 	setEnabled:FALSE];
+		[self.EncryptionAlgorithmPopup 	setEnabled:FALSE];
+	}
+	else {
+		[self.CompressionMethodSlider 	setEnabled:TRUE];
+		[self.EncryptionPasswordField 	setEnabled:TRUE];
+		[self.EncryptionRepeatField 	setEnabled:TRUE];
+		[self CheckEncryptionEnabled];
+	}
 }
 
 - (IBAction)ArchiveFormatChanged:(id)sender {
@@ -520,6 +509,8 @@
 	
 	self.ArchiveFormatIdx = SelectedArFormatIdx;
 	NSLog(@"Changed archive format: %i (%@)", SelectedArFormatIdx, self.archiveFormats[SelectedArFormatIdx]);
+	
+	[self ArchiveFormatHandleChange];
 }
 
 - (IBAction)CompressionMethodSliderChanged:(id)sender {

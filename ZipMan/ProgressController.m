@@ -20,7 +20,7 @@
 	[self DoCancel];
 }
 
-- (void)setTaskDescription:(NSString *)TaskDescription {
+- (void)SetTaskDescription:(NSString *)TaskDescription {
 	[self.TaskDescriptionText setStringValue:TaskDescription];
 }
 

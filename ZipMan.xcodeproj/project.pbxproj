@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		71171D4B26BAE2EA0078F9EE /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 71171D4A26BAE2EA0078F9EE /* Credits.rtf */; };
-		7136D53C26C0359C009E24A5 /* TarHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 7136D53B26C0359C009E24A5 /* TarHandler.m */; };
 		714666B326BD6F340017DAAB /* ZipMan.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 714666B226BD6F340017DAAB /* ZipMan.iconset */; };
 		7149599B26B9AC6300892725 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7149599A26B9AC6300892725 /* AppDelegate.m */; };
 		7149599D26B9AC6700892725 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7149599C26B9AC6700892725 /* Assets.xcassets */; };
@@ -26,8 +25,6 @@
 
 /* Begin PBXFileReference section */
 		71171D4A26BAE2EA0078F9EE /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
-		7136D53A26C0359C009E24A5 /* TarHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TarHandler.h; sourceTree = "<group>"; };
-		7136D53B26C0359C009E24A5 /* TarHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TarHandler.m; sourceTree = "<group>"; };
 		714666B226BD6F340017DAAB /* ZipMan.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = ZipMan.iconset; sourceTree = "<group>"; };
 		7149599626B9AC6300892725 /* ZipMan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZipMan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7149599926B9AC6300892725 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -99,8 +96,6 @@
 				717CE93326BD9DF800D6F319 /* ZipHandler.h */,
 				71E219F626BED5A400C4ED99 /* BaseArchiveHandler.h */,
 				71E219F726BED5A400C4ED99 /* BaseArchiveHandler.m */,
-				7136D53A26C0359C009E24A5 /* TarHandler.h */,
-				7136D53B26C0359C009E24A5 /* TarHandler.m */,
 			);
 			path = ZipMan;
 			sourceTree = "<group>";
@@ -194,7 +189,6 @@
 				717CE93226BD9DE900D6F319 /* ZipHandler.m in Sources */,
 				71B5473426BA907300F97107 /* ProgressController.m in Sources */,
 				714959A326B9AC6700892725 /* main.m in Sources */,
-				7136D53C26C0359C009E24A5 /* TarHandler.m in Sources */,
 				71BF8D6D26BBE38C00DEEAB4 /* PasswordPromptController.m in Sources */,
 				7149599B26B9AC6300892725 /* AppDelegate.m in Sources */,
 			);
@@ -334,23 +328,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = (
-					/opt/homebrew/Cellar/libzip/1.8.0/include,
-					/opt/homebrew/opt/libarchive/include,
-				);
+				HEADER_SEARCH_PATHS = /opt/homebrew/Cellar/libzip/1.8.0/include;
 				INFOPLIST_FILE = ZipMan/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					/opt/homebrew/Cellar/libzip/1.8.0/lib,
-					/opt/homebrew/opt/libarchive/lib,
-				);
-				OTHER_LDFLAGS = (
-					"-lzip",
-					"-larchive",
-				);
+				LIBRARY_SEARCH_PATHS = /opt/homebrew/Cellar/libzip/1.8.0/lib;
+				OTHER_LDFLAGS = "-lzip";
 				PRODUCT_BUNDLE_IDENTIFIER = com.billvog.ZipMan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -365,23 +350,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = (
-					/opt/homebrew/Cellar/libzip/1.8.0/include,
-					/opt/homebrew/opt/libarchive/include,
-				);
+				HEADER_SEARCH_PATHS = /opt/homebrew/Cellar/libzip/1.8.0/include;
 				INFOPLIST_FILE = ZipMan/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					/opt/homebrew/Cellar/libzip/1.8.0/lib,
-					/opt/homebrew/opt/libarchive/lib,
-				);
-				OTHER_LDFLAGS = (
-					"-lzip",
-					"-larchive",
-				);
+				LIBRARY_SEARCH_PATHS = /opt/homebrew/Cellar/libzip/1.8.0/lib;
+				OTHER_LDFLAGS = "-lzip";
 				PRODUCT_BUNDLE_IDENTIFIER = com.billvog.ZipMan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

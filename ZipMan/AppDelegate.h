@@ -13,24 +13,19 @@
 
 // Archive Handlers
 #import "ZipHandler.h"
-#import "TarHandler.h"
 
 // Preferences keys
+#define ArchiveFormatPrefKey		@"ArchiveFormat"
 #define ExcludeMacResForksPrefKey 	@"ExcludeMacResForks"
 #define DelFilesAfterCompPrefKey 	@"DeleteFilesAfterCompression"
 
-// Archive formats
-#define ZIP_IDX			0
-#define TAR_IDX			1
-
 @interface AppDelegate: NSObject <NSApplicationDelegate, NSTextFieldDelegate, ProgressDelegate, BaseArchiveHandlerDelegate>
 
-// Archive handles
-@property (nonatomic) ZipHandler* zipHandler;
-@property (nonatomic) TarHandler* tarHandler;
-
 // Variables
+@property (nonatomic) BaseArchiveHandler* archiveHandler;
+
 @property (nonatomic, retain) NSArray* 	archiveFormats;
+@property (nonatomic, retain) NSArray* 	archiveFormatExtensions;
 @property (nonatomic) int 				ArchiveFormatIdx;
 
 @property (nonatomic, retain) NSArray* 	compressionMethods;
@@ -66,9 +61,12 @@
 - (void)WalkDirToArchive:(NSString*)path
 		   baseEntryName:(NSString*)baseEntry;
 
+- (void)CreateArchive:(NSURL*)inputURL;
+- (void)ExtractArchive:(NSURL*)archiveURL;
+
 // Setup Archive Handlers
+- (void)SetupSelectedArchiveHandler;
 - (void)SetupZipHandler;
-- (void)SetupTarHandler;
 
 // Menu events
 - (IBAction)FileMenuCreateArchiveClicked:(id)sender;
@@ -76,6 +74,7 @@
 
 // Toolbar events
 - (IBAction)ArchiveFormatChanged:(id)sender;
+- (void)ArchiveFormatHandleChange;
 
 // Main Window Events
 - (IBAction)CompressionMethodSliderChanged:(id)sender;

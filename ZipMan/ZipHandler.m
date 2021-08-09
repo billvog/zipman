@@ -10,20 +10,27 @@
 @implementation ZipHandler
 @synthesize delegate;
 
-- (void)SetCompressionLevel:(zip_int32_t)level {
-	_CompressionLevel = level;
+- (id)init {
+	self = [super init];
+	self.SupportsCompression = TRUE;
+	self.SupportsEncryption = TRUE;
+	return self;
+}
+
+- (void)SetCompressionLevel:(int32_t)level {
+	self.CompressionLevel = level;
 }
 
 - (void)EnableEncryption:(BOOL)enabled {
-	_isEncryptionEnabled = enabled;
+	self.isEncryptionEnabled = enabled;
 }
 
-- (void)setDefaultPassword:(NSString*)password {
-	_DefaultPassword = password;
+- (void)SetDefaultPassword:(NSString*)password {
+	self.DefaultPassword = password;
 }
 
-- (void)SetEncryptionAlgorithm:(zip_uint16_t)algorithm {
-	_EncryptionAlgorithm = algorithm;
+- (void)SetEncryptionAlgorithm:(uint16_t)algorithm {
+	self.EncryptionAlgorithm = algorithm;
 }
 
 void onZipProgress(zip_t *zip, double progress, void *ud) {
@@ -43,7 +50,7 @@ int onZipCancel(zip_t *zip, void *ud) {
 	return 1;
 }
 
-- (BOOL)OpenZip:(NSString*)path readOnly:(BOOL)readOnly {
+- (BOOL)OpenArchive:(NSString*)path readOnly:(BOOL)readOnly {
 	zip_t *zip = zip_open([path UTF8String],
 						  readOnly ? ZIP_RDONLY : ZIP_CREATE,
 						  &_ZipErrorCode);
@@ -56,7 +63,7 @@ int onZipCancel(zip_t *zip, void *ud) {
 	return TRUE;
 }
 
-- (BOOL)CloseZip {
+- (BOOL)CloseArchive {
 	zip_register_progress_callback_with_state(self.Zip, 0.0, onZipProgress, NULL, (__bridge void *)(self));
 	
 	int ok = zip_close(self.Zip);
@@ -64,15 +71,15 @@ int onZipCancel(zip_t *zip, void *ud) {
 }
 
 - (BOOL)Check {
-	_NumOfEntries = zip_get_num_entries(self.Zip, 0);
-	NSLog(@"Zip: Found %lld entries in zip", _NumOfEntries);
+	self.NumOfEntries = zip_get_num_entries(self.Zip, 0);
+	NSLog(@"Zip: Found %lld entries in zip", self.NumOfEntries);
 	
 	bool askedForPassword = FALSE;
-	_TotalZipSize = 0u;
+	self.TotalArchiveSize = 0u;
 	
 	// Loop though all entries in archive to check some things
 	// before extracting
-	for (zip_int64_t idx = 0; idx < _NumOfEntries; idx++) {
+	for (zip_int64_t idx = 0; idx < self.NumOfEntries; idx++) {
 		zip_stat_t *stat = malloc(sizeof(zip_stat_t));
 		int res = zip_stat_index(self.Zip, idx, 0, stat);
 		if (res == -1) {
@@ -81,19 +88,19 @@ int onZipCancel(zip_t *zip, void *ud) {
 		}
 		
 		// Append entry size to sum
-		_TotalZipSize += stat->size;
+		self.TotalArchiveSize += stat->size;
 		
 		// Check if all entries are in a single folder
 		// then use that prefix to extract them all the root output path
 		if (idx == 0) {
 			NSString *entryName = [NSString stringWithUTF8String:stat->name];
-			_CommonEntriesPrefix = [entryName componentsSeparatedByString:@"/"][0];
+			self.CommonEntriesPrefix = [entryName componentsSeparatedByString:@"/"][0];
 		}
 		else {
 			NSString *entryName = [NSString stringWithUTF8String:stat->name];
 			NSString *entryPrefix = [entryName componentsSeparatedByString:@"/"][0];
-			if (![entryPrefix isEqualToString:_CommonEntriesPrefix])
-				_CommonEntriesPrefix = nil;
+			if (![entryPrefix isEqualToString:self.CommonEntriesPrefix])
+				self.CommonEntriesPrefix = @"";
 		}
 		
 		// Check if is encrypted
@@ -289,7 +296,7 @@ int onZipCancel(zip_t *zip, void *ud) {
 				fwrite(buffer, readchunk_size, 1, fp);
 
 				// Calculate progress
-				float progress = ((float) total_size_read / (float) self.TotalZipSize) * 100.0;
+				float progress = ((float) total_size_read / (float) self.TotalArchiveSize) * 100.0;
 				dispatch_sync(dispatch_get_main_queue(), ^{
 					[self.delegate onArchiveProgress:progress];
 				});

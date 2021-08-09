@@ -23,8 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong) IBOutlet NSProgressIndicator *ProgressIndicator;
 @property (strong) IBOutlet NSButton *CancelBtn;
 
-- (void)setTaskDescription:(NSString *)TaskDescription;
-- (void)UpdateProgress:(float) progress;
+- (void)SetTaskDescription:(NSString *)TaskDescription;
+- (void)UpdateProgress:(float)progress;
 - (void)DoCancel;
 
 - (IBAction)CancelClicked:(id)sender;
