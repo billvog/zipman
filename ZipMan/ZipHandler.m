@@ -9,9 +9,11 @@
 
 @implementation ZipHandler
 @synthesize delegate;
+@synthesize isOperationCanceled;
 
 - (id)init {
 	self = [super init];
+	isOperationCanceled = FALSE;
 	self.SupportsCompression = TRUE;
 	self.SupportsEncryption = TRUE;
 	return self;
@@ -196,7 +198,7 @@ int onZipCancel(zip_t *zip, void *ud) {
 	}
 }
 
-- (void)AddDir:(NSString*)entry {
+- (void)AddDir:(NSString*)dir entryName:(NSString*)entry {
 	const char *cEntryName = [entry UTF8String];
 	zip_int64_t idx = zip_add_dir(self.Zip, cEntryName);
 	if (idx == -1) {

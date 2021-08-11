@@ -23,7 +23,7 @@
 - (BOOL)CloseArchive { return false; }
 - (BOOL)Check { return false; }
 - (void)AddFile:(NSString*)file entryName:(NSString*)entry {}
-- (void)AddDir:(NSString*)entry {}
+- (void)AddDir:(NSString*)dir entryName:(NSString*)entry {}
 - (void)ExtractAll:(NSString*)output {}
 
 @end

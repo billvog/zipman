@@ -13,6 +13,7 @@
 
 // Archive Handlers
 #import "ZipHandler.h"
+#import "TarHandler.h"
 
 // Preferences keys
 #define ArchiveFormatPrefKey		@"ArchiveFormat"
@@ -22,18 +23,18 @@
 @interface AppDelegate: NSObject <NSApplicationDelegate, NSTextFieldDelegate, ProgressDelegate, BaseArchiveHandlerDelegate>
 
 // Variables
-@property (nonatomic) BaseArchiveHandler* archiveHandler;
+@property (nonatomic) BaseArchiveHandler* 	archiveHandler;
 
-@property (nonatomic, retain) NSArray* 	archiveFormats;
-@property (nonatomic, retain) NSArray* 	archiveFormatExtensions;
-@property (nonatomic) int 				ArchiveFormatIdx;
+@property (nonatomic, retain) NSArray* 		archiveFormats;
+@property (nonatomic, retain) NSArray* 		archiveFormatExtensions;
+@property (nonatomic) int 					ArchiveFormatIdx;
 
-@property (nonatomic, retain) NSArray* 	compressionMethods;
-@property (nonatomic) int 				CompressionMethodIdx;
+@property (nonatomic, retain) NSArray* 		compressionMethods;
+@property (nonatomic) int 					CompressionMethodIdx;
 
-@property (nonatomic, retain) NSArray* 	encryptionAlgorithms;
-@property (nonatomic) int 				EncryptionAlgorithmIdx;
-@property (nonatomic) BOOL 				isEncryptionEnabled;
+@property (nonatomic, retain) NSArray* 		encryptionAlgorithms;
+@property (nonatomic) int 					EncryptionAlgorithmIdx;
+@property (nonatomic) BOOL 					isEncryptionEnabled;
 
 @property AVAudioPlayer* audioPlayer;
 
@@ -56,6 +57,8 @@
 - (void)OpenProgressWindow:(NSString*)title
 		   taskDescription:(NSString*)task;
 
+- (void)RmFileOrThrow:(NSString*)file;
+
 - (void)CheckEncryptionEnabled;
 
 - (void)WalkDirToArchive:(NSString*)path
@@ -67,6 +70,7 @@
 // Setup Archive Handlers
 - (void)SetupSelectedArchiveHandler;
 - (void)SetupZipHandler;
+- (void)SetupTarHandler;
 
 // Menu events
 - (IBAction)FileMenuCreateArchiveClicked:(id)sender;

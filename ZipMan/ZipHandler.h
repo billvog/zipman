@@ -1,6 +1,6 @@
 //
 //  ZipHandler.h
-//  This class handles all the Zip operations using libzip
+//  This class handles all the zip operations using libzip
 //
 //  Created by  Βασίλης Βογιατζής on 6/8/21.
 //

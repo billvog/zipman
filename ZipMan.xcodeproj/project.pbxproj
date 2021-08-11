@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		71171D4B26BAE2EA0078F9EE /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 71171D4A26BAE2EA0078F9EE /* Credits.rtf */; };
+		713A2EBD26C3CB7A00D5EF5F /* TarHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 713A2EBC26C3CB7A00D5EF5F /* TarHandler.m */; };
 		714666B326BD6F340017DAAB /* ZipMan.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 714666B226BD6F340017DAAB /* ZipMan.iconset */; };
 		7149599B26B9AC6300892725 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7149599A26B9AC6300892725 /* AppDelegate.m */; };
 		7149599D26B9AC6700892725 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7149599C26B9AC6700892725 /* Assets.xcassets */; };
@@ -25,6 +26,8 @@
 
 /* Begin PBXFileReference section */
 		71171D4A26BAE2EA0078F9EE /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
+		713A2EBB26C3CB7A00D5EF5F /* TarHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TarHandler.h; sourceTree = "<group>"; };
+		713A2EBC26C3CB7A00D5EF5F /* TarHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TarHandler.m; sourceTree = "<group>"; };
 		714666B226BD6F340017DAAB /* ZipMan.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = ZipMan.iconset; sourceTree = "<group>"; };
 		7149599626B9AC6300892725 /* ZipMan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZipMan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7149599926B9AC6300892725 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -59,6 +62,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		713A2EBA26C3CB5E00D5EF5F /* Archive Handlers */ = {
+			isa = PBXGroup;
+			children = (
+				717CE93126BD9DE900D6F319 /* ZipHandler.m */,
+				717CE93326BD9DF800D6F319 /* ZipHandler.h */,
+				71E219F626BED5A400C4ED99 /* BaseArchiveHandler.h */,
+				71E219F726BED5A400C4ED99 /* BaseArchiveHandler.m */,
+				713A2EBB26C3CB7A00D5EF5F /* TarHandler.h */,
+				713A2EBC26C3CB7A00D5EF5F /* TarHandler.m */,
+			);
+			name = "Archive Handlers";
+			sourceTree = "<group>";
+		};
 		7149598D26B9AC6300892725 = {
 			isa = PBXGroup;
 			children = (
@@ -92,10 +108,7 @@
 				71BF8D6826BBE37100DEEAB4 /* PasswordPrompt.xib */,
 				71BF8D6A26BBE38C00DEEAB4 /* PasswordPromptController.h */,
 				71BF8D6B26BBE38C00DEEAB4 /* PasswordPromptController.m */,
-				717CE93126BD9DE900D6F319 /* ZipHandler.m */,
-				717CE93326BD9DF800D6F319 /* ZipHandler.h */,
-				71E219F626BED5A400C4ED99 /* BaseArchiveHandler.h */,
-				71E219F726BED5A400C4ED99 /* BaseArchiveHandler.m */,
+				713A2EBA26C3CB5E00D5EF5F /* Archive Handlers */,
 			);
 			path = ZipMan;
 			sourceTree = "<group>";
@@ -189,6 +202,7 @@
 				717CE93226BD9DE900D6F319 /* ZipHandler.m in Sources */,
 				71B5473426BA907300F97107 /* ProgressController.m in Sources */,
 				714959A326B9AC6700892725 /* main.m in Sources */,
+				713A2EBD26C3CB7A00D5EF5F /* TarHandler.m in Sources */,
 				71BF8D6D26BBE38C00DEEAB4 /* PasswordPromptController.m in Sources */,
 				7149599B26B9AC6300892725 /* AppDelegate.m in Sources */,
 			);
@@ -328,14 +342,24 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = /opt/homebrew/Cellar/libzip/1.8.0/include;
+				HEADER_SEARCH_PATHS = (
+					/opt/homebrew/Cellar/libzip/1.8.0/include,
+					/opt/homebrew/Cellar/libtar/1.2.20/include,
+				);
 				INFOPLIST_FILE = ZipMan/Info.plist;
+				"LD_MAP_FILE_PATH[arch=*]" = "$(TARGET_TEMP_DIR)/$(PRODUCT_NAME)-LinkMap-$(CURRENT_VARIANT)-$(CURRENT_ARCH).txt";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/Cellar/libzip/1.8.0/lib;
-				OTHER_LDFLAGS = "-lzip";
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/Cellar/libzip/1.8.0/lib,
+					/opt/homebrew/Cellar/libtar/1.2.20/lib,
+				);
+				OTHER_LDFLAGS = (
+					"-lzip",
+					"-ltar",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.billvog.ZipMan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -350,14 +374,23 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = /opt/homebrew/Cellar/libzip/1.8.0/include;
+				HEADER_SEARCH_PATHS = (
+					/opt/homebrew/Cellar/libzip/1.8.0/include,
+					/opt/homebrew/Cellar/libtar/1.2.20/include,
+				);
 				INFOPLIST_FILE = ZipMan/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/Cellar/libzip/1.8.0/lib;
-				OTHER_LDFLAGS = "-lzip";
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/Cellar/libzip/1.8.0/lib,
+					/opt/homebrew/Cellar/libtar/1.2.20/lib,
+				);
+				OTHER_LDFLAGS = (
+					"-lzip",
+					"-ltar",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.billvog.ZipMan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

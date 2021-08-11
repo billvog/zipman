@@ -75,6 +75,14 @@
 		[self.archiveHandler CancelOperation];
 }
 
+- (void)RmFileOrThrow:(NSString*)file {
+	NSError *error;
+	bool ok = [[NSFileManager defaultManager] removeItemAtPath:file error:&error];
+	if (!ok) {
+		[NSException raise:@"Error removing file" format:@"Error removing file at %@: %@", file, error.localizedDescription];
+	}
+}
+
 - (void)WalkDirToArchive:(NSString*)path
 		   baseEntryName:(NSString*)baseEntry
 {
@@ -93,7 +101,7 @@
 		NSURL *fileUrl = [NSURL fileURLWithPath:fullPath];
 		
 		if ([fileUrl hasDirectoryPath]) {
-			[self.archiveHandler AddDir:entryName];
+			[self.archiveHandler AddDir:fullPath entryName:entryName];
 			[self WalkDirToArchive:fullPath baseEntryName:entryName];
 		}
 		else {
@@ -144,6 +152,9 @@
 	switch (self.ArchiveFormatIdx) {
 		case ZIP_IDX:
 			[self SetupZipHandler];
+			break;
+		case TAR_IDX:
+			[self SetupTarHandler];
 			break;
 		default:
 			[NSException raise:@"Unsupported archive format" format:@"The selected archive format is not supported"];
@@ -202,6 +213,12 @@
 	if (self.isEncryptionEnabled) {
 		[self.archiveHandler SetDefaultPassword:[self.EncryptionPasswordField stringValue]];
 	}
+}
+
+- (void)SetupTarHandler {
+	// Load handler
+	self.archiveHandler = [[TarHandler alloc] init];
+	self.archiveHandler.delegate = self;
 }
 
 - (void)CreateArchive:(NSURL*)inputURL {
@@ -284,16 +301,9 @@
 						[NSException raise:@"Error closing archive" format:@"%@", error];
 					}
 					else {
-						bool ok;
 						if (self.DelAfterCompCheckbox.state == NSControlStateValueOn) {
 							NSLog(@"Deleting input files because DelAfterCompCheckbox is checked");
-
-							NSError *error;
-							ok = [[NSFileManager defaultManager] removeItemAtPath:inputPath error:&error];
-							if (!ok) {
-								[NSException raise:@"Error deleting input files"
-											format:@"%@", error.localizedDescription];
-							}
+							[self RmFileOrThrow:inputPath];
 						}
 					}
 
@@ -303,6 +313,7 @@
 					[alert runModal];
 				});
 			} @catch (NSException *exception) {
+				[self RmFileOrThrow:archiveOutputPath];
 				dispatch_sync(dispatch_get_main_queue(), ^{
 					NSAlert *alert = [[NSAlert alloc] init];
 					[alert setAlertStyle:NSAlertStyleCritical];
@@ -320,6 +331,8 @@
 		NSThread *AddToArchiveThread = [[NSThread alloc] initWithBlock:AddToArchiveBlock];
 		[AddToArchiveThread start];
 	} @catch (NSException *exception) {
+		[self RmFileOrThrow:archiveOutputPath];
+		
 		NSAlert *alert = [[NSAlert alloc] init];
 		[alert setAlertStyle:NSAlertStyleCritical];
 		[alert setMessageText:exception.name];
@@ -475,6 +488,8 @@
 }
 
 - (void)ArchiveFormatHandleChange {
+	[self SetupSelectedArchiveHandler];
+	
 	int SelectedArFormatIdx = (int) self.ArchiveFormatSelector.indexOfSelectedItem;
 	if (SelectedArFormatIdx != self.ArchiveFormatIdx) {
 		[self.ArchiveFormatSelector selectItemAtIndex:self.ArchiveFormatIdx];
@@ -484,17 +499,22 @@
 	[[NSUserDefaults standardUserDefaults] setInteger:self.ArchiveFormatIdx forKey:ArchiveFormatPrefKey];
 	
 	// Update UI
-	if (self.ArchiveFormatIdx == TAR_IDX) {
-		[self.CompressionMethodSlider 	setEnabled:FALSE];
-		[self.EncryptionPasswordField 	setEnabled:FALSE];
-		[self.EncryptionRepeatField 	setEnabled:FALSE];
-		[self.EncryptionAlgorithmPopup 	setEnabled:FALSE];
+	if (self.archiveHandler.SupportsCompression) {
+		[self.CompressionMethodSlider 	setEnabled:TRUE];
 	}
 	else {
-		[self.CompressionMethodSlider 	setEnabled:TRUE];
+		[self.CompressionMethodSlider 	setEnabled:FALSE];
+	}
+	
+	if (self.archiveHandler.SupportsEncryption) {
 		[self.EncryptionPasswordField 	setEnabled:TRUE];
 		[self.EncryptionRepeatField 	setEnabled:TRUE];
 		[self CheckEncryptionEnabled];
+	}
+	else {
+		[self.EncryptionPasswordField 	setEnabled:FALSE];
+		[self.EncryptionRepeatField 	setEnabled:FALSE];
+		[self.EncryptionAlgorithmPopup 	setEnabled:FALSE];
 	}
 }
 

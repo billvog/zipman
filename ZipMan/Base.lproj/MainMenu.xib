@@ -169,7 +169,7 @@
                                                     <action selector="CompressionMethodSliderChanged:" target="Voe-Tx-rLC" id="Zmd-uI-2Wk"/>
                                                 </connections>
                                             </slider>
-                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Aic-lS-1Tb">
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Aic-lS-1Tb">
                                                 <rect key="frame" x="-1" y="2" width="123" height="16"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                 <textFieldCell key="cell" title="Encryption Method:" id="xZ1-IL-hIL">
@@ -178,7 +178,7 @@
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
-                                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="maA-qi-GJE">
+                                            <popUpButton verticalHuggingPriority="750" id="maA-qi-GJE">
                                                 <rect key="frame" x="125" y="-4" width="306" height="25"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                 <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4jl-zL-9T5" id="TNR-N8-cc1">
@@ -276,6 +276,13 @@
                                                 </gridCells>
                                             </gridView>
                                         </subviews>
+                                        <constraints>
+                                            <constraint firstItem="Aic-lS-1Tb" firstAttribute="leading" secondItem="QML-nZ-1q7" secondAttribute="leading" constant="1" id="4Ih-zo-GWM"/>
+                                            <constraint firstAttribute="trailing" secondItem="maA-qi-GJE" secondAttribute="trailing" constant="2" id="DII-FU-mou"/>
+                                            <constraint firstItem="maA-qi-GJE" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Aic-lS-1Tb" secondAttribute="trailing" constant="8" symbolic="YES" id="HMj-Mu-QQd"/>
+                                            <constraint firstItem="maA-qi-GJE" firstAttribute="centerY" secondItem="Aic-lS-1Tb" secondAttribute="centerY" id="Hqw-Ol-STe"/>
+                                            <constraint firstAttribute="bottom" secondItem="maA-qi-GJE" secondAttribute="bottom" id="yU7-qu-WgH"/>
+                                        </constraints>
                                     </view>
                                     <size key="contentViewMargins" width="16" height="16"/>
                                 </box>

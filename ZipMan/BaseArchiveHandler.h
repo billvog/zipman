@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)CloseArchive;
 - (BOOL)Check;
 - (void)AddFile:(NSString*)file entryName:(NSString*)entry;
-- (void)AddDir:(NSString*)entry;
+- (void)AddDir:(NSString*)dir entryName:(NSString*)entry;
 - (void)ExtractAll:(NSString*)output;
 @end
 
