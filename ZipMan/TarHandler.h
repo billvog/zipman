@@ -7,22 +7,28 @@
 
 #import <Foundation/Foundation.h>
 
-#include <libtar.h>
+#include <archive.h>
+#include <archive_entry.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include <errno.h>
 #include <utime.h>
+#include <pwd.h>
+#include <grp.h>
+
+#include <libtar.h>
 
 #import "BaseArchiveHandler.h"
-
-/* custom altered macros for reading/writing tarchive blocks */
-#define mytar_block_read(t, buf) \
-	(*((t)->type->readfunc))((int)(t)->fd, (char *)(buf), T_BLOCKSIZE)
-#define mytar_block_write(t, buf) \
-	(*((t)->type->writefunc))((int)(t)->fd, (char *)(buf), T_BLOCKSIZE)
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TarHandler : BaseArchiveHandler
-@property (nonatomic, readonly) TAR *Tar;
+@property (nonatomic, readonly) struct archive *Tar;
+@property (nonatomic) BOOL isReadOnly;
+
+
+- (void)TarEntryFromStat:(struct archive_entry*)entry
+					stat:(struct stat)stat;
 
 - (int)SetFilePerms:(char*)realname;
 @end
