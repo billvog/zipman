@@ -14,8 +14,11 @@
 - (id)init {
 	self = [super init];
 	isOperationCanceled = FALSE;
+	
+	self.SupportsProgress = TRUE;
 	self.SupportsCompression = TRUE;
 	self.SupportsEncryption = TRUE;
+	
 	return self;
 }
 
@@ -33,6 +36,10 @@
 
 - (void)SetEncryptionAlgorithm:(uint16_t)algorithm {
 	self.EncryptionAlgorithm = algorithm;
+}
+
+- (mode_t)ZipAttrToMode:(zip_uint32_t)attributes {
+	return (mode_t)((attributes) >> 16L);
 }
 
 void onZipProgress(zip_t *zip, double progress, void *ud) {
@@ -215,22 +222,16 @@ int onZipCancel(zip_t *zip, void *ud) {
 	for (zip_int64_t idx = 0; idx < self.NumOfEntries; idx++) {
 		zip_stat_t *stat = malloc(sizeof(zip_stat_t));
 
-		int res = zip_stat_index(self.Zip, idx, 0, stat);
-		if (res == -1) {
+		int ok = zip_stat_index(self.Zip, idx, 0, stat);
+		if (ok == -1) {
 			NSLog(@"Zip: Cannot stat entry at index: %lld", idx);
 			continue;
 		}
 
 		NSString *currOutputPath;
-		if (self.NumOfEntries == 1) {
-			currOutputPath = output;
-		}
-		else {
-			NSString *entryName = [NSString stringWithUTF8String:stat->name];
-			entryName = [entryName substringFromIndex:self.CommonEntriesPrefix.length + 1];
-
-			currOutputPath = [NSString stringWithFormat:@"%@/%@", output, entryName];
-		}
+		NSString *entryName = [NSString stringWithUTF8String:stat->name];
+		entryName = [entryName substringFromIndex:self.CommonEntriesPrefix.length + 1];
+		currOutputPath = [NSString stringWithFormat:@"%@/%@", output, entryName];
 
 		dispatch_sync(dispatch_get_main_queue(), ^{
 			[self.delegate onArchiveTaskChanged:[NSString stringWithFormat:@"Extracting \"%@\"", currOutputPath]];
@@ -259,20 +260,34 @@ int onZipCancel(zip_t *zip, void *ud) {
 				[NSException raise:@"Error creating folder at \"%@\"" format:@"%@", error.localizedDescription];
 			}
 
+			// Get entry mode
+			zip_uint32_t entry_attr;
+			zip_uint8_t opsys = ZIP_OPSYS_DEFAULT;
+			ok = zip_file_get_external_attributes(self.Zip, idx, 0, &opsys, &entry_attr);
+			if (ok == -1) {
+				NSLog(@"Zip: Error getting external attributes of %@: %@", entryName, [self GetError]);
+				[NSException raise:@"Error getting external attributes of entry" format:@"%@", [self GetError]];
+			}
+			
+			// Convert attributes to mode_t
+			mode_t output_mode = [self ZipAttrToMode:entry_attr];
+			
 			// Open output file
-			FILE *fp = fopen(cOutputPath, "wb");
-			if (fp == NULL) {
+			FILE *output_file;
+			int output_fd = open(cOutputPath, O_WRONLY | O_CREAT, output_mode);
+			output_file = fdopen(output_fd, "wb");
+			if (output_file == NULL) {
 				const char *error_msg = strerror(errno);
 				NSLog(@"Zip: Cannot create file at \"%s\": %s", cOutputPath, error_msg);
 				[NSException raise:
 				   [NSString stringWithFormat:@"Failed creating file \"%s\"", cOutputPath]
-							 format:@"%s", error_msg];
+							format:@"%s", error_msg];
 			}
 
 			// Open file in zip
 			zip_file_t *file = zip_fopen_index(self.Zip, idx, 0);
 			if (file == NULL) {
-				fclose(fp);
+				fclose(output_file);
 
 				const char *error_msg = zip_strerror(self.Zip);
 				NSLog(@"Zip: Error accessing file %s [%lld]: %s", stat->name, idx, error_msg);
@@ -295,7 +310,7 @@ int onZipCancel(zip_t *zip, void *ud) {
 				bytes_left -= bytes_read;
 				total_size_read += bytes_read;
 
-				fwrite(buffer, readchunk_size, 1, fp);
+				fwrite(buffer, readchunk_size, 1, output_file);
 
 				// Calculate progress
 				float progress = ((float) total_size_read / (float) self.TotalArchiveSize) * 100.0;
@@ -309,14 +324,14 @@ int onZipCancel(zip_t *zip, void *ud) {
 			}
 
 			// Release resources
-			fclose(fp);
+			fclose(output_file);
 			zip_fclose(file);
 
 			if (self.isOperationCanceled) {
 				[NSException raise:@"Error extracting zip" format:@"Operation cancelled"];
 			}
 
-			NSLog(@"Created file: %s", stat->name);
+			NSLog(@"Zip: Created file: %s", stat->name);
 		}
 	}
 }

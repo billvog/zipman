@@ -68,6 +68,7 @@
 	[self.progressController showWindow:self];
 	[[self.progressController window] setTitle:title];
 	[self.progressController SetTaskDescription:task];
+	[self.progressController SetIndeterminate:self.archiveHandler.SupportsProgress];
 }
 
 - (void)onOperationCanceled {
@@ -99,6 +100,11 @@
 		NSString *entryName = [NSString stringWithFormat:@"%@/%@", baseEntry, filename];
 		NSString *fullPath = [NSString stringWithFormat:@"%@/%@", path, filename];
 		NSURL *fileUrl = [NSURL fileURLWithPath:fullPath];
+		
+		dispatch_sync(dispatch_get_main_queue(), ^{
+			// Update task on progress window
+			[self onArchiveTaskChanged:[NSString stringWithFormat:@"Adding \"%@\"", fullPath]];
+		});
 		
 		if ([fileUrl hasDirectoryPath]) {
 			[self.archiveHandler AddDir:fullPath entryName:entryName];
@@ -273,17 +279,20 @@
 		}
 
 		// Show progress window
-		[self OpenProgressWindow:@"In Progress..."
-				 taskDescription:[NSString stringWithFormat:@"Archiving \"%@\"", inputPath]];
+		[self OpenProgressWindow:[NSString stringWithFormat:@"Archiving \"%@\"", inputPath]
+				 taskDescription:@"Preparing..."];
 		
 		// Add selected in archive (in seperate thread)
 		void (^AddToArchiveBlock)(void) = ^{
 			@try {
 				if (inputURL.hasDirectoryPath) {
 					// Add directory
+					[self.archiveHandler AddDir:inputPath entryName:[inputURL lastPathComponent]];
 					[self WalkDirToArchive:inputPath baseEntryName:[inputURL lastPathComponent]];
 				}
 				else {
+					// Update task on progress window
+					[self onArchiveTaskChanged:[NSString stringWithFormat:@"Adding \"%@\"", inputPath]];
 					// Add file
 					[self.archiveHandler AddFile:inputPath entryName:[inputURL lastPathComponent]];
 				}
@@ -389,7 +398,7 @@
 		
 		// Show progress window
 		[self OpenProgressWindow:[NSString stringWithFormat:@"Extracting \"%@\"", archivePath]
-				 taskDescription:[NSString stringWithFormat:@"Extracting \"%@\"", archivePath]];
+				 taskDescription:@"Preparing..."];
 
 		// Extract all entries (in seperate thread)
 		void (^ArchiveExtractBlock)(void) = ^{
@@ -433,7 +442,7 @@
 			dispatch_sync(dispatch_get_main_queue(), ^{
 				NSAlert *alert = [[NSAlert alloc] init];
 				[alert setMessageText:@"Success"];
-				[alert setInformativeText:[NSString stringWithFormat:@"Zip extracted at %@", outputPath]];
+				[alert setInformativeText:[NSString stringWithFormat:@"Archive extracted at %@", outputPath]];
 				[alert runModal];
 			});
 		};

@@ -345,6 +345,7 @@
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/Cellar/libzip/1.8.0/include,
 					/opt/homebrew/Cellar/libtar/1.2.20/include,
+					/opt/homebrew/Cellar/libarchive/3.5.1_1/include,
 				);
 				INFOPLIST_FILE = ZipMan/Info.plist;
 				"LD_MAP_FILE_PATH[arch=*]" = "$(TARGET_TEMP_DIR)/$(PRODUCT_NAME)-LinkMap-$(CURRENT_VARIANT)-$(CURRENT_ARCH).txt";
@@ -355,10 +356,12 @@
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/Cellar/libzip/1.8.0/lib,
 					/opt/homebrew/Cellar/libtar/1.2.20/lib,
+					/opt/homebrew/Cellar/libarchive/3.5.1_1/,
 				);
 				OTHER_LDFLAGS = (
 					"-lzip",
 					"-ltar",
+					"-larchive",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.billvog.ZipMan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -377,6 +380,7 @@
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/Cellar/libzip/1.8.0/include,
 					/opt/homebrew/Cellar/libtar/1.2.20/include,
+					/opt/homebrew/Cellar/libarchive/3.5.1_1/include,
 				);
 				INFOPLIST_FILE = ZipMan/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -386,10 +390,12 @@
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/Cellar/libzip/1.8.0/lib,
 					/opt/homebrew/Cellar/libtar/1.2.20/lib,
+					/opt/homebrew/Cellar/libarchive/3.5.1_1/,
 				);
 				OTHER_LDFLAGS = (
 					"-lzip",
 					"-ltar",
+					"-larchive",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.billvog.ZipMan;
 				PRODUCT_NAME = "$(TARGET_NAME)";

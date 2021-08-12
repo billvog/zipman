@@ -26,8 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id <BaseArchiveHandlerDelegate> delegate;
 @property (readonly) BOOL isOperationCanceled;
 
+// Compatibility settings
+@property (nonatomic) BOOL			SupportsProgress;
 @property (nonatomic) BOOL			SupportsCompression;
 @property (nonatomic) BOOL			SupportsEncryption;
+
 @property (nonatomic) int32_t		CompressionLevel;
 @property (nonatomic) BOOL 			isEncryptionEnabled;
 @property (nonatomic) NSString* 	DefaultPassword;

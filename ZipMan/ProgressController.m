@@ -24,6 +24,18 @@
 	[self.TaskDescriptionText setStringValue:TaskDescription];
 }
 
+- (void)SetIndeterminate:(BOOL)value {
+	[self.ProgressIndicator setHidden:NO];
+	[self.ProgressIndicator setIndeterminate:value];
+	[self.ProgressIndicator setUsesThreadedAnimation:value];
+	if (value) {
+		[self.ProgressIndicator startAnimation:nil];
+	}
+	else {
+		[self.ProgressIndicator stopAnimation:nil];
+	}
+}
+
 - (void)UpdateProgress:(float) progress {
 	// Limit updates to one per 500ms
 	NSTimeInterval interval = [NSDate.now timeIntervalSinceDate:self.lastUpdatedProgress];

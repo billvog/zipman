@@ -23,7 +23,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="459" height="67"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <progressIndicator fixedFrame="YES" maxValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="fZ7-y4-jHQ" userLabel="ProgressIndicator">
+                    <progressIndicator hidden="YES" fixedFrame="YES" maxValue="100" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="fZ7-y4-jHQ" userLabel="ProgressIndicator">
                         <rect key="frame" x="20" y="17" width="385" height="20"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     </progressIndicator>

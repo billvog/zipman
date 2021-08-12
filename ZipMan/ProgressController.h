@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong) IBOutlet NSButton *CancelBtn;
 
 - (void)SetTaskDescription:(NSString *)TaskDescription;
+- (void)SetIndeterminate:(BOOL)value;
 - (void)UpdateProgress:(float)progress;
 - (void)DoCancel;
 
