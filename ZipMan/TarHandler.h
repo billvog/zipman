@@ -26,11 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) struct archive *Tar;
 @property (nonatomic) BOOL isReadOnly;
 
+- (BOOL)ReopenArchive;
 
 - (void)TarEntryFromStat:(struct archive_entry*)entry
 					stat:(struct stat)stat;
-
-- (int)SetFilePerms:(char*)realname;
 @end
 
 NS_ASSUME_NONNULL_END

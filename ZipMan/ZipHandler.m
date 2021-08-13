@@ -60,9 +60,11 @@ int onZipCancel(zip_t *zip, void *ud) {
 }
 
 - (BOOL)OpenArchive:(NSString*)path readOnly:(BOOL)readOnly {
-	zip_t *zip = zip_open([path UTF8String],
-						  readOnly ? ZIP_RDONLY : ZIP_CREATE,
-						  &_ZipErrorCode);
+	self.Filename = path;
+	
+	const char *cPath = [path UTF8String];
+	
+	zip_t *zip = zip_open(cPath, readOnly ? ZIP_RDONLY : ZIP_CREATE, &_ZipErrorCode);
 	if (zip == NULL) {
 		return FALSE;
 	}
@@ -73,8 +75,10 @@ int onZipCancel(zip_t *zip, void *ud) {
 }
 
 - (BOOL)CloseArchive {
+	// Register progress callback
 	zip_register_progress_callback_with_state(self.Zip, 0.0, onZipProgress, NULL, (__bridge void *)(self));
 	
+	// Close zip
 	int ok = zip_close(self.Zip);
 	return ok == 0;
 }
@@ -170,9 +174,9 @@ int onZipCancel(zip_t *zip, void *ud) {
 	zip_int64_t index = zip_file_add(self.Zip, entryName, source, ZIP_FL_OVERWRITE);
 	if (index == -1) {
 		zip_source_free(source);
-		const char *error_msg = zip_strerror(self.Zip);
-		NSLog(@"Zip: Error adding file to zip: %s", error_msg);
-		[NSException raise:@"Error adding file to zip" format:@"%s", error_msg];
+		NSString *error = [self GetError];
+		NSLog(@"Zip: Error adding file to zip: %@", error);
+		[NSException raise:@"Error adding file to zip" format:@"%@", error];
 	}
 	
 	zip_int32_t CompressionMethod;
@@ -187,9 +191,9 @@ int onZipCancel(zip_t *zip, void *ud) {
 	int res = zip_set_file_compression(self.Zip, index, CompressionMethod, self.CompressionLevel);
 	if (res != 0) {
 		zip_source_free(source);
-		const char *error_msg = zip_strerror(self.Zip);
-		NSLog(@"Zip: Error applying compression: %s", error_msg);
-		[NSException raise:@"Error applying compression" format:@"%s", error_msg];
+		NSString *error = [self GetError];
+		NSLog(@"Zip: Error applying compression: %@", error);
+		[NSException raise:@"Error applying compression" format:@"%@", error];
 	}
 	
 	// Apply encryption (if it is enabled)
@@ -198,9 +202,9 @@ int onZipCancel(zip_t *zip, void *ud) {
 									  [self.DefaultPassword UTF8String]);
 		if (res != 0) {
 			zip_source_free(source);
-			const char *error_msg = zip_strerror(self.Zip);
-			NSLog(@"Zip: Error applying encryption: %s", error_msg);
-			[NSException raise:@"Error applying encryption" format:@"%s", error_msg];
+			NSString *error = [self GetError];
+			NSLog(@"Zip: Error applying encryption: %@", error);
+			[NSException raise:@"Error applying encryption" format:@"%@", error];
 		}
 	}
 }

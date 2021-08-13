@@ -26,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id <BaseArchiveHandlerDelegate> delegate;
 @property (readonly) BOOL isOperationCanceled;
 
+// Archive settings
+@property (nonatomic) NSString*		Filename;
+
 // Compatibility settings
 @property (nonatomic) BOOL			SupportsProgress;
 @property (nonatomic) BOOL			SupportsCompression;
