@@ -25,15 +25,9 @@
 }
 
 - (void)SetIndeterminate:(BOOL)value {
-	[self.ProgressIndicator setHidden:NO];
 	[self.ProgressIndicator setIndeterminate:value];
-	[self.ProgressIndicator setUsesThreadedAnimation:value];
-	if (value) {
-		[self.ProgressIndicator startAnimation:nil];
-	}
-	else {
-		[self.ProgressIndicator stopAnimation:nil];
-	}
+	[self.ProgressIndicator setUsesThreadedAnimation:TRUE];
+	[self.ProgressIndicator startAnimation:nil];
 }
 
 - (void)UpdateProgress:(float) progress {

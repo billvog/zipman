@@ -38,6 +38,11 @@
 	self.EncryptionAlgorithm = algorithm;
 }
 
+- (void)CancelOperation {
+	isOperationCanceled = TRUE;
+	zip_register_cancel_callback_with_state(self.Zip, onZipCancel, NULL, (__bridge void*)(self));
+}
+
 - (mode_t)ZipAttrToMode:(zip_uint32_t)attributes {
 	return (mode_t)((attributes) >> 16L);
 }
@@ -131,6 +136,7 @@ int onZipCancel(zip_t *zip, void *ud) {
 				// Show PasswordPrompt as sheet
 				NSString *password = [self.delegate onArchiveAskPwdForEncryption];
 				if (password == nil) {
+					isOperationCanceled = TRUE;
 					return FALSE;
 				}
 				

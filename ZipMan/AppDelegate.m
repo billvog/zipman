@@ -68,7 +68,8 @@
 	[self.progressController showWindow:self];
 	[[self.progressController window] setTitle:title];
 	[self.progressController SetTaskDescription:task];
-	[self.progressController SetIndeterminate:self.archiveHandler.SupportsProgress];
+	[self.progressController SetIndeterminate:
+	 !self.archiveHandler.SupportsProgress];
 }
 
 - (void)onOperationCanceled {
@@ -77,6 +78,10 @@
 }
 
 - (void)RmFileOrThrow:(NSString*)file {
+	bool exists = [[NSFileManager defaultManager] fileExistsAtPath:file];
+	if (!exists)
+		return;
+	
 	NSError *error;
 	bool ok = [[NSFileManager defaultManager] removeItemAtPath:file error:&error];
 	if (!ok) {
@@ -299,23 +304,26 @@
 
 				bool ok = [self.archiveHandler CloseArchive];
 
-				// Close dialog
+				// Close progress dialog
 				dispatch_sync(dispatch_get_main_queue(), ^{
 					[self.progressController close];
-
-					// Check for errors
-					if (!ok) {
-						NSString *error = [self.archiveHandler GetError];
-						NSLog(@"Error closing archive: %@", error);
-						[NSException raise:@"Error closing archive" format:@"%@", error];
+				});
+				
+				// Check for errors
+				if (!ok) {
+					NSString *error = [self.archiveHandler GetError];
+					NSLog(@"Error closing archive: %@", error);
+					[NSException raise:@"Error closing archive" format:@"%@", error];
+				}
+				
+				dispatch_sync(dispatch_get_main_queue(), ^{
+					// Check if delete-after-compression is ON
+					if (self.DelAfterCompCheckbox.state == NSControlStateValueOn) {
+						NSLog(@"Deleting input files because DelAfterCompCheckbox is checked");
+						[self RmFileOrThrow:inputPath];
 					}
-					else {
-						if (self.DelAfterCompCheckbox.state == NSControlStateValueOn) {
-							NSLog(@"Deleting input files because DelAfterCompCheckbox is checked");
-							[self RmFileOrThrow:inputPath];
-						}
-					}
 
+					// Show success alert
 					NSAlert *alert = [[NSAlert alloc] init];
 					[alert setMessageText:@"Success"];
 					[alert setInformativeText:[NSString stringWithFormat:@"Archive created at \"%@\"", archiveOutputPath]];
@@ -341,7 +349,6 @@
 		[AddToArchiveThread start];
 	} @catch (NSException *exception) {
 		[self RmFileOrThrow:archiveOutputPath];
-		
 		NSAlert *alert = [[NSAlert alloc] init];
 		[alert setAlertStyle:NSAlertStyleCritical];
 		[alert setMessageText:exception.name];

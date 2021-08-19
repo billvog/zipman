@@ -210,9 +210,8 @@
                                                 </columns>
                                                 <gridCells>
                                                     <gridCell row="Phz-nJ-CLS" column="GpP-Lp-KbP" id="S06-yq-yad">
-                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" id="yPj-2e-Zy2">
-                                                            <rect key="frame" x="-2" y="36" width="87" height="16"/>
-                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yPj-2e-Zy2">
+                                                            <rect key="frame" x="-2" y="34" width="87" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Password:" id="95R-No-Tjx">
                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -221,9 +220,8 @@
                                                         </textField>
                                                     </gridCell>
                                                     <gridCell row="Phz-nJ-CLS" column="SGN-Fv-koa" id="ObQ-pm-8ZM">
-                                                        <secureTextField key="contentView" verticalHuggingPriority="750" ambiguous="YES" id="4CW-MU-Qq7">
-                                                            <rect key="frame" x="95" y="36" width="297" height="16"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                        <secureTextField key="contentView" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4CW-MU-Qq7">
+                                                            <rect key="frame" x="95" y="31" width="297" height="21"/>
                                                             <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="B9D-zI-sK1">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -235,16 +233,14 @@
                                                         </secureTextField>
                                                     </gridCell>
                                                     <gridCell row="Phz-nJ-CLS" column="Se4-F3-7Ca" id="oq3-sq-bgY">
-                                                        <imageView key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" id="Dsz-2D-yk2">
-                                                            <rect key="frame" x="408" y="37.5" width="17.5" height="15"/>
-                                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                                        <imageView key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dsz-2D-yk2">
+                                                            <rect key="frame" x="408" y="34.5" width="17.5" height="15"/>
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lock.open" catalog="system" id="euv-j4-CLB"/>
                                                         </imageView>
                                                     </gridCell>
                                                     <gridCell row="n4j-1a-MD5" column="GpP-Lp-KbP" id="HQF-81-Zbk">
-                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" id="7oC-yZ-EUU">
-                                                            <rect key="frame" x="-2" y="7" width="87" height="16"/>
-                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7oC-yZ-EUU">
+                                                            <rect key="frame" x="-2" y="5" width="87" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Repeat:" id="rTh-8I-cMd">
                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -253,9 +249,8 @@
                                                         </textField>
                                                     </gridCell>
                                                     <gridCell row="n4j-1a-MD5" column="SGN-Fv-koa" id="utm-Cc-4bR">
-                                                        <secureTextField key="contentView" verticalHuggingPriority="750" ambiguous="YES" id="uho-2z-L6P">
-                                                            <rect key="frame" x="95" y="5" width="297" height="21"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <secureTextField key="contentView" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uho-2z-L6P">
+                                                            <rect key="frame" x="95" y="2" width="297" height="21"/>
                                                             <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="HhR-kI-6DH">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -267,9 +262,8 @@
                                                         </secureTextField>
                                                     </gridCell>
                                                     <gridCell row="n4j-1a-MD5" column="Se4-F3-7Ca" id="6Os-WG-6u0">
-                                                        <imageView key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" id="MvW-ts-RsJ">
-                                                            <rect key="frame" x="404" y="0.0" width="25" height="30"/>
-                                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                                        <imageView key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MvW-ts-RsJ">
+                                                            <rect key="frame" x="404" y="0.0" width="25" height="25"/>
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="Kva-x6-ZLk"/>
                                                         </imageView>
                                                     </gridCell>

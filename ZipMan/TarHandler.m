@@ -143,6 +143,9 @@
 	char buffer[readblock_size];
 	
 	while (bytes_left > 0) {
+		if (self.isOperationCanceled)
+			break;
+		
 		if (readblock_size > bytes_left) {
 			readblock_size = bytes_left;
 		}
@@ -161,6 +164,11 @@
 	// Release resources
 	fclose(input_file);
 	archive_entry_free(tar_entry);
+	
+	// Check if canceled
+	if (self.isOperationCanceled) {
+		[NSException raise:@"Error creating tar" format:@"Operation cancelled"];
+	}
 }
 
 - (void)AddDir:(NSString*)dir entryName:(NSString*)entry {
@@ -215,7 +223,7 @@
 			currOutputPath = output;
 		}
 		else {
-			entryName = [entryName substringFromIndex:self.CommonEntriesPrefix.length + 1];
+			entryName = [entryName substringFromIndex:self.CommonEntriesPrefix.length];
 			currOutputPath = [NSString stringWithFormat:@"%@/%@", output, entryName];
 		}
 
